@@ -235,7 +235,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">AS3-3: 美國的人口統計和就業資料</h1>
 <h4 class="author"><em>第 6 組</em></h4>
-<h4 class="date"><em>2019-03-11 15:11:23</em></h4>
+<h4 class="date"><em>2019-03-11 17:28:05</em></h4>
 
 </div>
 
@@ -263,14 +263,18 @@ $(document).ready(function () {
 <p><br><br></p>
 <div id="section-1-loading-and-summarizing-the-dataset" class="section level3">
 <h3>Section-1 Loading and Summarizing the Dataset</h3>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">CPS=<span class="kw">read.csv</span>(<span class="st">&quot;data/CPSData.csv&quot;</span>)
-<span class="co">#install.packages(&quot;dplyr&quot;) </span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#讀取CPS並安裝%&gt;%方便後續作業，下載dplyr後記得要把它註記掉喔！以免每次讀取都跑出來亂～</span>
+CPS=<span class="kw">read.csv</span>(<span class="st">&quot;data/CPSData.csv&quot;</span>)
+<span class="co">#install.packages(&quot;dplyr&quot;) 就是在說它</span>
 <span class="kw">library</span>(dplyr)</code></pre></div>
 <p><strong>§ 1.1</strong> How many interviewees are in the dataset?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">nrow</span>(CPS)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#讀取資料庫的觀察值數量</span>
+<span class="kw">nrow</span>(CPS)</code></pre></div>
 <pre><code>[1] 131302</code></pre>
+<p>有131302個</p>
 <p><strong>§ 1.2</strong> Among the interviewees with a value reported for the Industry variable, what is the most common industry of employment? Please enter the name exactly how you see it.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(CPS<span class="op">$</span>Industry)<span class="co"># Educational and health services</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#列出各產業別數量</span>
+<span class="kw">table</span>(CPS<span class="op">$</span>Industry)</code></pre></div>
 <pre><code>
 Agriculture, forestry, fishing, and hunting                                Armed forces 
                                        1307                                          29 
@@ -286,77 +290,28 @@ Agriculture, forestry, fishing, and hunting                                Armed
                                        7519                                        3186 
                                       Trade                Transportation and utilities 
                                        8933                                        3260 </code></pre>
+<p>最多的是 Educational and health services</p>
 <p><strong>§ 1.3</strong> Which state has the fewest interviewees?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sort</span>(<span class="kw">table</span>(CPS<span class="op">$</span>State))</code></pre></div>
-<pre><code>
-          New Mexico              Montana          Mississippi              Alabama 
-                1102                 1214                 1230                 1376 
-       West Virginia             Arkansas            Louisiana                Idaho 
-                1409                 1421                 1450                 1518 
-            Oklahoma              Arizona               Alaska              Wyoming 
-                1523                 1528                 1590                 1624 
-        North Dakota       South Carolina            Tennessee District of Columbia 
-                1645                 1658                 1784                 1791 
-            Kentucky                 Utah               Nevada              Vermont 
-                1841                 1842                 1856                 1890 
-              Kansas               Oregon             Nebraska        Massachusetts 
-                1935                 1943                 1949                 1987 
-        South Dakota              Indiana               Hawaii             Missouri 
-                2000                 2004                 2099                 2145 
-        Rhode Island             Delaware                Maine           Washington 
-                2209                 2214                 2263                 2366 
-                Iowa           New Jersey       North Carolina        New Hampshire 
-                2528                 2567                 2619                 2662 
-           Wisconsin              Georgia          Connecticut             Colorado 
-                2686                 2807                 2836                 2925 
-            Virginia             Michigan            Minnesota             Maryland 
-                2953                 3063                 3139                 3200 
-                Ohio             Illinois         Pennsylvania              Florida 
-                3678                 3912                 3930                 5149 
-            New York                Texas           California 
-                5595                 7077                11570 </code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">min</span>(<span class="kw">sort</span>(<span class="kw">table</span>(CPS<span class="op">$</span>State)))<span class="co"># New Mexico </span></code></pre></div>
-<pre><code>[1] 1102</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#先列出所有州的面試者數量，再點出最少者</span>
+<span class="kw">which.min</span>(<span class="kw">sort</span>(<span class="kw">table</span>(CPS<span class="op">$</span>State)))</code></pre></div>
+<pre><code>New Mexico 
+         1 </code></pre>
+<p>New Mexico的受面試者最少</p>
 <p>Which state has the largest number of interviewees?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sort</span>(<span class="kw">table</span>(CPS<span class="op">$</span>State))</code></pre></div>
-<pre><code>
-          New Mexico              Montana          Mississippi              Alabama 
-                1102                 1214                 1230                 1376 
-       West Virginia             Arkansas            Louisiana                Idaho 
-                1409                 1421                 1450                 1518 
-            Oklahoma              Arizona               Alaska              Wyoming 
-                1523                 1528                 1590                 1624 
-        North Dakota       South Carolina            Tennessee District of Columbia 
-                1645                 1658                 1784                 1791 
-            Kentucky                 Utah               Nevada              Vermont 
-                1841                 1842                 1856                 1890 
-              Kansas               Oregon             Nebraska        Massachusetts 
-                1935                 1943                 1949                 1987 
-        South Dakota              Indiana               Hawaii             Missouri 
-                2000                 2004                 2099                 2145 
-        Rhode Island             Delaware                Maine           Washington 
-                2209                 2214                 2263                 2366 
-                Iowa           New Jersey       North Carolina        New Hampshire 
-                2528                 2567                 2619                 2662 
-           Wisconsin              Georgia          Connecticut             Colorado 
-                2686                 2807                 2836                 2925 
-            Virginia             Michigan            Minnesota             Maryland 
-                2953                 3063                 3139                 3200 
-                Ohio             Illinois         Pennsylvania              Florida 
-                3678                 3912                 3930                 5149 
-            New York                Texas           California 
-                5595                 7077                11570 </code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">max</span>(<span class="kw">sort</span>(<span class="kw">table</span>(CPS<span class="op">$</span>State)))<span class="co"># California</span></code></pre></div>
-<pre><code>[1] 11570</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#先列出所有州的面試者數量，再點出最多者</span>
+<span class="kw">which.max</span>(<span class="kw">sort</span>(<span class="kw">table</span>(CPS<span class="op">$</span>State)))</code></pre></div>
+<pre><code>California 
+        51 </code></pre>
+<p>California的受面試者最多</p>
 <p><strong>§ 1.4</strong> What proportion of interviewees are citizens of the United States?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">nrow</span>(CPS)</code></pre></div>
-<pre><code>[1] 131302</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(CPS<span class="op">$</span>Citizenship)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#列出個別項目後，再進行比率計算</span>
+<span class="kw">table</span>(CPS<span class="op">$</span>Citizenship)</code></pre></div>
 <pre><code>
      Citizen, Native Citizen, Naturalized          Non-Citizen 
               116639                 7073                 7590 </code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(<span class="dv">116639</span><span class="op">+</span><span class="st"> </span><span class="dv">7073</span>)<span class="op">/</span><span class="dv">131302</span><span class="co"># 0.9422</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(<span class="dv">116639</span><span class="op">+</span><span class="st"> </span><span class="dv">7073</span>)<span class="op">/</span><span class="dv">131302</span></code></pre></div>
 <pre><code>[1] 0.9422</code></pre>
+<p>比率是0.9422</p>
 <p><strong>§ 1.5</strong> For which races are there at least 250 interviewees in the CPS dataset of Hispanic ethnicity? (Select all that apply.)</p>
 <ul>
 <li>American Indian</li>
@@ -366,12 +321,13 @@ Agriculture, forestry, fishing, and hunting                                Armed
 <li>Pacific Islander</li>
 <li>White</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(CPS<span class="op">$</span>Hispanic,CPS<span class="op">$</span>Race)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#先找出表格後，再目視挑出250以上者</span>
+<span class="kw">table</span>(CPS<span class="op">$</span>Hispanic,CPS<span class="op">$</span>Race)</code></pre></div>
 <pre><code>   
     American Indian Asian Black Multiracial Pacific Islander White
   0            1129  6407 13292        2449              541 89190
   1             304   113   621         448               77 16731</code></pre>
-<p>Indian,Black,Multiracial,White</p>
+<p>共4種：Indian, Black, Multiracial, White</p>
 <p><br><br></p>
 <hr />
 </div>
@@ -394,7 +350,8 @@ Agriculture, forestry, fishing, and hunting                                Armed
 <li>EmploymentStatus</li>
 <li>Industry</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(CPS)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#直接列出後，目視找出有缺項的變數項目(NA)</span>
+<span class="kw">summary</span>(CPS)</code></pre></div>
 <pre><code> PeopleInHousehold       Region               State       MetroAreaCode        Age      
  Min.   : 1.00     Midwest  :30684   California  :11570   Min.   :10420   Min.   : 0.0  
  1st Qu.: 2.00     Northeast:25939   Texas       : 7077   1st Qu.:21780   1st Qu.:19.0  
@@ -435,10 +392,11 @@ Agriculture, forestry, fishing, and hunting                                Armed
  Leisure and hospitality           : 6364  
  (Other)                           :21618  
  NA's                              :65060  </code></pre>
-<p>MetroAreaCode,Married,Education,EmploymentStatus,Industry</p>
+<p>有以下： MetroAreaCode Married,Education EmploymentStatus Industry</p>
 <p><strong>§ 2.2</strong> Which is the most accurate:</p>
 <p>x The Married variable being missing is related to the Region value for the interviewee. x The Married variable being missing is related to the Sex value for the interviewee. O The Married variable being missing is related to the Age value for the interviewee. x The Married variable being missing is related to the Citizenship value for the interviewee. + The Married variable being missing is not related to the Region, Sex, Age, or Citizenship value for the interviewee.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(CPS<span class="op">$</span>Region, <span class="kw">is.na</span>(CPS<span class="op">$</span>Married))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#以表格分別列出後，檢視其關連性</span>
+<span class="kw">table</span>(CPS<span class="op">$</span>Region, <span class="kw">is.na</span>(CPS<span class="op">$</span>Married))</code></pre></div>
 <pre><code>           
             FALSE  TRUE
   Midwest   24609  6075
@@ -543,7 +501,8 @@ Agriculture, forestry, fishing, and hunting                                Armed
   Non-Citizen           7098   492</code></pre>
 <p>Age</p>
 <p><strong>§ 2.3</strong> How many states had all interviewees living in a non-metropolitan area (aka they have a missing MetroAreaCode value)? For this question, treat the District of Columbia as a state (even though it is not technically a state).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(<span class="kw">is.na</span>(CPS<span class="op">$</span>MetroAreaCode),CPS<span class="op">$</span>State)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#以表格列出各州不是住在大都會區的人數</span>
+<span class="kw">table</span>(<span class="kw">is.na</span>(CPS<span class="op">$</span>MetroAreaCode),CPS<span class="op">$</span>State)</code></pre></div>
 <pre><code>       
         Alabama Alaska Arizona Arkansas California Colorado Connecticut Delaware
   FALSE    1020      0    1327      724      11333     2545        2593     1696
@@ -572,9 +531,10 @@ Agriculture, forestry, fishing, and hunting                                Armed
         West Virginia Wisconsin Wyoming
   FALSE           344      1882       0
   TRUE           1065       804    1624</code></pre>
-<p>2 (Alaska &amp; Wyoming)</p>
+<p>有2州 (Alaska &amp; Wyoming)</p>
 <p>How many states had all interviewees living in a metropolitan area? Again, treat the District of Columbia as a state.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(<span class="kw">is.na</span>(CPS<span class="op">$</span>MetroAreaCode),CPS<span class="op">$</span>State)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#以表格列出各州不是住在大都會區的人數</span>
+<span class="kw">table</span>(<span class="kw">is.na</span>(CPS<span class="op">$</span>MetroAreaCode),CPS<span class="op">$</span>State)</code></pre></div>
 <pre><code>       
         Alabama Alaska Arizona Arkansas California Colorado Connecticut Delaware
   FALSE    1020      0    1327      724      11333     2545        2593     1696
@@ -603,18 +563,20 @@ Agriculture, forestry, fishing, and hunting                                Armed
         West Virginia Wisconsin Wyoming
   FALSE           344      1882       0
   TRUE           1065       804    1624</code></pre>
-<p>3 (District of Columbia &amp; New Jersey &amp; Rhode Island)</p>
+<p>有3州 District of Columbia, New Jersey, Rhode Island</p>
 <p><strong>§ 2.4</strong> Which region of the United States has the largest proportion of interviewees living in a non-metropolitan area?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(CPS<span class="op">$</span>Region,<span class="kw">is.na</span>(CPS<span class="op">$</span>MetroAreaCode))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#以表格列出在美國並非住在大都會區的面試者數量</span>
+<span class="kw">table</span>(CPS<span class="op">$</span>Region,<span class="kw">is.na</span>(CPS<span class="op">$</span>MetroAreaCode))</code></pre></div>
 <pre><code>           
             FALSE  TRUE
   Midwest   20010 10674
   Northeast 20330  5609
   South     31631  9871
   West      25093  8084</code></pre>
-<p>Midwest is the most (10674)</p>
+<p>以Midwest為最多 (共10674)</p>
 <p><strong>§ 2.5</strong> Which state has a proportion of interviewees living in a non-metropolitan area closest to 30%?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tapply</span>(<span class="kw">is.na</span>(CPS<span class="op">$</span>MetroAreaCode),CPS<span class="op">$</span>State,mean)<span class="op">%&gt;%</span>sort</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#選出美國各州中並非住在大都會地區的居民比例，然後排序</span>
+<span class="kw">tapply</span>(<span class="kw">is.na</span>(CPS<span class="op">$</span>MetroAreaCode),CPS<span class="op">$</span>State,mean)<span class="op">%&gt;%</span>sort</code></pre></div>
 <pre><code>District of Columbia           New Jersey         Rhode Island           California 
              0.00000              0.00000              0.00000              0.02048 
              Florida        Massachusetts             Maryland             New York 
@@ -641,9 +603,10 @@ Agriculture, forestry, fishing, and hunting                                Armed
              0.69431              0.70250              0.73739              0.75586 
              Montana               Alaska              Wyoming 
              0.83608              1.00000              1.00000 </code></pre>
-<p>Wisconsin is nearest to 30% (0.29933)</p>
+<p>威斯康辛州最接近30% (為0.29933)</p>
 <p>Which state has the largest proportion of non-metropolitan interviewees, ignoring states where all interviewees were non-metropolitan?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tapply</span>(<span class="kw">is.na</span>(CPS<span class="op">$</span>MetroAreaCode),CPS<span class="op">$</span>State,mean)<span class="op">%&gt;%</span>sort</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##選出美國各州中並非住在大都會地區的居民比例並排序，但要剔除極端值(100％)
+<span class="kw">tapply</span>(<span class="kw">is.na</span>(CPS<span class="op">$</span>MetroAreaCode),CPS<span class="op">$</span>State,mean)<span class="op">%&gt;%</span>sort</code></pre></div>
 <pre><code>District of Columbia           New Jersey         Rhode Island           California 
              0.00000              0.00000              0.00000              0.02048 
              Florida        Massachusetts             Maryland             New York 
@@ -670,28 +633,31 @@ Agriculture, forestry, fishing, and hunting                                Armed
              0.69431              0.70250              0.73739              0.75586 
              Montana               Alaska              Wyoming 
              0.83608              1.00000              1.00000 </code></pre>
-<p>Montana 0.83608</p>
+<p>蒙大拿州勝出 Montana （共0.83608）</p>
 <p><br><br></p>
 <hr />
 </div>
 <div id="section-3-integrating-metropolitan-area-data" class="section level3">
 <h3>Section-3 Integrating Metropolitan Area Data</h3>
 <p><strong>§ 3.1</strong> How many observations (codes for metropolitan areas) are there in MetroAreaMap?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">MetroAreaMap=<span class="kw">read.csv</span>(<span class="st">&quot;data/MetroAreaCodes.csv&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#先讀取MetroAreaMap以及CountryMap兩個資料庫，再檢視MetroAreaMap的資料組成</span>
+MetroAreaMap=<span class="kw">read.csv</span>(<span class="st">&quot;data/MetroAreaCodes.csv&quot;</span>)
 CountryMap=<span class="kw">read.csv</span>(<span class="st">&quot;data/CountryCodes.csv&quot;</span>)
 <span class="kw">str</span>(MetroAreaMap)</code></pre></div>
 <pre><code>'data.frame':   271 obs. of  2 variables:
  $ Code     : int  460 3000 3160 3610 3720 6450 10420 10500 10580 10740 ...
  $ MetroArea: Factor w/ 271 levels &quot;Akron, OH&quot;,&quot;Albany-Schenectady-Troy, NY&quot;,..: 12 92 97 117 122 195 1 3 2 4 ...</code></pre>
-<p>271</p>
+<p>共271個觀察值</p>
 <p>How many observations (codes for countries) are there in CountryMap?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(CountryMap)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#檢視MountryMap的資料組成</span>
+<span class="kw">str</span>(CountryMap)</code></pre></div>
 <pre><code>'data.frame':   149 obs. of  2 variables:
  $ Code   : int  57 66 73 78 96 100 102 103 104 105 ...
  $ Country: Factor w/ 149 levels &quot;Afghanistan&quot;,..: 139 57 105 135 97 3 11 18 24 37 ...</code></pre>
-<p>149</p>
+<p>共149個觀察值</p>
 <p><strong>§ 3.2</strong> What is the name of the variable that was added to the data frame by the merge() operation?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">CPS =<span class="st"> </span><span class="kw">merge</span>(CPS, MetroAreaMap, <span class="dt">by.x=</span><span class="st">&quot;MetroAreaCode&quot;</span>, <span class="dt">by.y=</span><span class="st">&quot;Code&quot;</span>, <span class="dt">all.x=</span><span class="ot">TRUE</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#先將新項目整合到原資料庫中，再檢視資料組成</span>
+CPS =<span class="st"> </span><span class="kw">merge</span>(CPS, MetroAreaMap, <span class="dt">by.x=</span><span class="st">&quot;MetroAreaCode&quot;</span>, <span class="dt">by.y=</span><span class="st">&quot;Code&quot;</span>, <span class="dt">all.x=</span><span class="ot">TRUE</span>)
 <span class="kw">str</span>(CPS)</code></pre></div>
 <pre><code>'data.frame':   131302 obs. of  15 variables:
  $ MetroAreaCode     : int  10420 10420 10420 10420 10420 10420 10420 10420 10420 10420 ...
@@ -709,9 +675,10 @@ CountryMap=<span class="kw">read.csv</span>(<span class="st">&quot;data/CountryC
  $ EmploymentStatus  : Factor w/ 5 levels &quot;Disabled&quot;,&quot;Employed&quot;,..: NA NA 4 3 1 2 3 NA 2 2 ...
  $ Industry          : Factor w/ 14 levels &quot;Agriculture, forestry, fishing, and hunting&quot;,..: NA NA NA NA NA 7 NA NA 4 13 ...
  $ MetroArea         : Factor w/ 271 levels &quot;Akron, OH&quot;,&quot;Albany-Schenectady-Troy, NY&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...</code></pre>
-<p>MetroArea</p>
+<p>新增項目為MetroArea</p>
 <p>How many interviewees have a missing value for the new metropolitan area variable?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(CPS)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#列出各項並檢視有缺漏值的變數項目</span>
+<span class="kw">summary</span>(CPS)</code></pre></div>
 <pre><code> MetroAreaCode   PeopleInHousehold       Region               State            Age      
  Min.   :10420   Min.   : 1.00     Midwest  :30684   California  :11570   Min.   : 0.0  
  1st Qu.:21780   1st Qu.: 2.00     Northeast:25939   Texas       : 7077   1st Qu.:19.0  
@@ -762,7 +729,8 @@ CountryMap=<span class="kw">read.csv</span>(<span class="st">&quot;data/CountryC
  NA's                                              :34238  </code></pre>
 <p>NA’s=34238</p>
 <p><strong>§ 3.3</strong> Which of the following metropolitan areas has the largest number of interviewees?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tail</span>(<span class="kw">sort</span>(<span class="kw">table</span>(CPS<span class="op">$</span>MetroArea)),<span class="dv">10</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#列出居住在各大都會地區的受面試者數量並由小排到大並選出最後10個</span>
+<span class="kw">tail</span>(<span class="kw">sort</span>(<span class="kw">table</span>(CPS<span class="op">$</span>MetroArea)),<span class="dv">10</span>)</code></pre></div>
 <pre><code>
                     Houston-Baytown-Sugar Land, TX 
                                               1649 
@@ -786,7 +754,8 @@ New York-Northern New Jersey-Long Island, NY-NJ-PA
                                               5409 </code></pre>
 <p>Boston-Cambridge-Quincy, MA-NH</p>
 <p><strong>§ 3.4</strong> Which metropolitan area has the highest proportion of interviewees of Hispanic ethnicity?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sort</span>(<span class="kw">tapply</span>(CPS<span class="op">$</span>Hispanic, CPS<span class="op">$</span>MetroArea, mean))<span class="op">%&gt;%</span><span class="kw">tail</span>(<span class="dv">10</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#根據條件算出比率後由小排到大並選出最後10個</span>
+<span class="kw">sort</span>(<span class="kw">tapply</span>(CPS<span class="op">$</span>Hispanic, CPS<span class="op">$</span>MetroArea, mean))<span class="op">%&gt;%</span><span class="kw">tail</span>(<span class="dv">10</span>)</code></pre></div>
 <pre><code>               Salinas, CA                 Merced, CA         Corpus Christi, TX 
                     0.5577                     0.5660                     0.6061 
                 Madera, CA            San Antonio, TX              El Centro, CA 
@@ -797,7 +766,8 @@ New York-Northern New Jersey-Long Island, NY-NJ-PA
                     0.9663 </code></pre>
 <p>Laredo, TX (0.966292)</p>
 <p><strong>§ 3.5</strong> Determine the number of metropolitan areas in the United States from which at least 20% of interviewees are Asian.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tail</span>(<span class="kw">sort</span>(<span class="kw">tapply</span>(CPS<span class="op">$</span>Race <span class="op">==</span><span class="st"> &quot;Asian&quot;</span>, CPS<span class="op">$</span>MetroArea, mean)),<span class="dv">10</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#根據條件選出後，由小到大排序並選出最後10個</span>
+<span class="kw">tail</span>(<span class="kw">sort</span>(<span class="kw">tapply</span>(CPS<span class="op">$</span>Race <span class="op">==</span><span class="st"> &quot;Asian&quot;</span>, CPS<span class="op">$</span>MetroArea, mean)),<span class="dv">10</span>)</code></pre></div>
 <pre><code>    San Diego-Carlsbad-San Marcos, CA Sacramento-Arden-Arcade-Roseville, CA 
                                0.1422                                0.1424 
                     Atlantic City, NJ                          Stockton, CA 
@@ -810,7 +780,8 @@ New York-Northern New Jersey-Long Island, NY-NJ-PA
                                0.2468                                0.5019 </code></pre>
 <p>Honolulu, HI; San Francisco-Oakland-Fremont, CA; San Jose-Sunnyvale-Santa Clara, CA; and Vallejo-Fairfield, CA</p>
 <p><strong>§ 3.6</strong> Passing na.rm=TRUE to the tapply function, determine which metropolitan area has the smallest proportion of interviewees who have received no high school diploma.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sort</span>(<span class="kw">tapply</span>(CPS<span class="op">$</span>Education <span class="op">==</span><span class="st"> &quot;No high school diploma&quot;</span>, CPS<span class="op">$</span>MetroArea, mean, <span class="dt">na.rm=</span><span class="ot">TRUE</span>))<span class="op">%&gt;%</span>head</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#根據條件選出後，由小到大排序並選出前10個</span>
+<span class="kw">sort</span>(<span class="kw">tapply</span>(CPS<span class="op">$</span>Education <span class="op">==</span><span class="st"> &quot;No high school diploma&quot;</span>, CPS<span class="op">$</span>MetroArea, mean, <span class="dt">na.rm=</span><span class="ot">TRUE</span>))<span class="op">%&gt;%</span>head</code></pre></div>
 <pre><code>           Iowa City, IA        Bowling Green, KY    Kalamazoo-Portage, MI 
                  0.02913                  0.03704                  0.05051 
     Champaign-Urbana, IL Bremerton-Silverdale, WA             Lawrence, KS 
@@ -822,7 +793,8 @@ New York-Northern New Jersey-Long Island, NY-NJ-PA
 <div id="section-4-integrating-country-of-birth-data" class="section level3">
 <h3>Section-4 Integrating Country of Birth Data</h3>
 <p><strong>§ 4.1</strong> What is the name of the variable added to the CPS data frame by this merge operation?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">CPS =<span class="st"> </span><span class="kw">merge</span>(CPS, CountryMap, <span class="dt">by.x=</span><span class="st">&quot;CountryOfBirthCode&quot;</span>, <span class="dt">by.y=</span><span class="st">&quot;Code&quot;</span>, <span class="dt">all.x=</span><span class="ot">TRUE</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#合併CPS中的CountryOfBirthCode欄和CountryMap中的Code欄，保留前者的全部欄位，並檢視資料</span>
+CPS =<span class="st"> </span><span class="kw">merge</span>(CPS, CountryMap, <span class="dt">by.x=</span><span class="st">&quot;CountryOfBirthCode&quot;</span>, <span class="dt">by.y=</span><span class="st">&quot;Code&quot;</span>, <span class="dt">all.x=</span><span class="ot">TRUE</span>)
 <span class="kw">summary</span>(CPS)</code></pre></div>
 <pre><code> CountryOfBirthCode MetroAreaCode   PeopleInHousehold       Region     
  Min.   : 57.0      Min.   :10420   Min.   : 1.00     Midwest  :30684  
@@ -874,7 +846,8 @@ New York-Northern New Jersey-Long Island, NY-NJ-PA
  NA's                                              :34238   NA's         :   176  </code></pre>
 <p>country</p>
 <p>How many interviewees have a missing value for the new metropolitan area variable?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(CPS)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#檢視新欄位中的缺漏值</span>
+<span class="kw">summary</span>(CPS)</code></pre></div>
 <pre><code> CountryOfBirthCode MetroAreaCode   PeopleInHousehold       Region     
  Min.   : 57.0      Min.   :10420   Min.   : 1.00     Midwest  :30684  
  1st Qu.: 57.0      1st Qu.:21780   1st Qu.: 2.00     Northeast:25939  
@@ -925,15 +898,17 @@ New York-Northern New Jersey-Long Island, NY-NJ-PA
  NA's                                              :34238   NA's         :   176  </code></pre>
 <p>country’s NA’s =176</p>
 <p><strong>§ 4.2</strong> Among all interviewees born outside of North America, which country was the most common place of birth?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sort</span>(<span class="kw">table</span>(CPS<span class="op">$</span>Country))<span class="op">%&gt;%</span><span class="kw">tail</span>(<span class="dv">10</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#用表格列出後由小到大排序並取最後10個國家</span>
+<span class="kw">sort</span>(<span class="kw">table</span>(CPS<span class="op">$</span>Country))<span class="op">%&gt;%</span><span class="kw">tail</span>(<span class="dv">10</span>)</code></pre></div>
 <pre><code>
          Cuba       Germany       Vietnam   El Salvador   Puerto Rico         China 
           426           438           458           477           518           581 
         India   Philippines        Mexico United States 
           770           839          3921        115063 </code></pre>
-<p>Philippines 839</p>
+<p>Philippines 839 是美洲外最多的國家</p>
 <p><strong>§ 4.3</strong> What proportion of the interviewees from the “New York-Northern New Jersey-Long Island, NY-NJ-PA” metropolitan area have a country of birth that is not the United States?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(CPS<span class="op">$</span>MetroArea <span class="op">==</span><span class="st"> &quot;New York-Northern New Jersey-Long Island, NY-NJ-PA&quot;</span>, CPS<span class="op">$</span>Country <span class="op">!=</span><span class="st"> &quot;United States&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#由MetroArea欄位中只選出上述大都會地區的受面試者數據，再進行比率計算</span>
+<span class="kw">table</span>(CPS<span class="op">$</span>MetroArea <span class="op">==</span><span class="st"> &quot;New York-Northern New Jersey-Long Island, NY-NJ-PA&quot;</span>, CPS<span class="op">$</span>Country <span class="op">!=</span><span class="st"> &quot;United States&quot;</span>)</code></pre></div>
 <pre><code>       
         FALSE  TRUE
   FALSE 78757 12744
@@ -942,7 +917,8 @@ New York-Northern New Jersey-Long Island, NY-NJ-PA
 <pre><code>[1] 0.3087</code></pre>
 <p>0.3087</p>
 <p><strong>§ 4.4</strong> Which metropolitan area has the largest number (note – not proportion) of interviewees with a country of birth in India?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tapply</span>(CPS<span class="op">$</span>Country<span class="op">==</span><span class="st">&quot;India&quot;</span>,CPS<span class="op">$</span>MetroArea,sum,<span class="dt">na.rm=</span><span class="ot">TRUE</span>)<span class="op">%&gt;%</span>sort<span class="op">%&gt;%</span><span class="kw">tail</span>(<span class="dv">10</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#根據題目條件選出並由小到大排序，再選出最後10筆資料</span>
+<span class="kw">tapply</span>(CPS<span class="op">$</span>Country<span class="op">==</span><span class="st">&quot;India&quot;</span>,CPS<span class="op">$</span>MetroArea,sum,<span class="dt">na.rm=</span><span class="ot">TRUE</span>)<span class="op">%&gt;%</span>sort<span class="op">%&gt;%</span><span class="kw">tail</span>(<span class="dv">10</span>)</code></pre></div>
 <pre><code>                San Jose-Sunnyvale-Santa Clara, CA 
                                                 19 
             Minneapolis-St Paul-Bloomington, MN-WI 
@@ -965,7 +941,8 @@ New York-Northern New Jersey-Long Island, NY-NJ-PA
                                                 96 </code></pre>
 <p>New York</p>
 <p>In Brazil?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tapply</span>(CPS<span class="op">$</span>Country<span class="op">==</span><span class="st">&quot;Brazil&quot;</span>,CPS<span class="op">$</span>MetroArea,sum,<span class="dt">na.rm=</span><span class="ot">TRUE</span>)<span class="op">%&gt;%</span>sort<span class="op">%&gt;%</span><span class="kw">tail</span>(<span class="dv">10</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#根據題目條件選出並由小到大排序，再選出最後10筆資料</span>
+<span class="kw">tapply</span>(CPS<span class="op">$</span>Country<span class="op">==</span><span class="st">&quot;Brazil&quot;</span>,CPS<span class="op">$</span>MetroArea,sum,<span class="dt">na.rm=</span><span class="ot">TRUE</span>)<span class="op">%&gt;%</span>sort<span class="op">%&gt;%</span><span class="kw">tail</span>(<span class="dv">10</span>)</code></pre></div>
 <pre><code>               Davenport-Moline-Rock Island, IA-IL 
                                                  4 
           Philadelphia-Camden-Wilmington, PA-NJ-DE 
@@ -988,7 +965,8 @@ New York-Northern New Jersey-Long Island, NY-NJ-PA
                                                 18 </code></pre>
 <p>Boston</p>
 <p>In Somalia?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sort</span>(<span class="kw">tapply</span>(CPS<span class="op">$</span>Country <span class="op">==</span><span class="st"> &quot;Somalia&quot;</span>, CPS<span class="op">$</span>MetroArea, sum, <span class="dt">na.rm=</span><span class="ot">TRUE</span>))<span class="op">%&gt;%</span><span class="kw">tail</span>(<span class="dv">10</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#根據題目條件選出並由小到大排序，再選出最後10筆資料</span>
+<span class="kw">sort</span>(<span class="kw">tapply</span>(CPS<span class="op">$</span>Country <span class="op">==</span><span class="st"> &quot;Somalia&quot;</span>, CPS<span class="op">$</span>MetroArea, sum, <span class="dt">na.rm=</span><span class="ot">TRUE</span>))<span class="op">%&gt;%</span><span class="kw">tail</span>(<span class="dv">10</span>)</code></pre></div>
 <pre><code>                       Sioux Falls, SD        Burlington-South Burlington, VT 
                                      2                                      3 
            Portland-South Portland, ME    Portland-Vancouver-Beaverton, OR-WA 

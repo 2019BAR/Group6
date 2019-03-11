@@ -239,18 +239,21 @@ NA's=34238
 
 __§ 3.3__ Which of the following metropolitan areas has the largest number of interviewees?
 ```{r}
+#列出居住在各大都會地區的受面試者數量並由小排到大並選出最後10個
 tail(sort(table(CPS$MetroArea)),10)
 ```
 Boston-Cambridge-Quincy, MA-NH
 
 __§ 3.4__ Which metropolitan area has the highest proportion of interviewees of Hispanic ethnicity?
 ```{r}
+#根據條件算出比率後由小排到大並選出最後10個
 sort(tapply(CPS$Hispanic, CPS$MetroArea, mean))%>%tail(10)
 ```
 Laredo, TX (0.966292)
 
 __§ 3.5__ Determine the number of metropolitan areas in the United States from which at least 20% of interviewees are Asian.
 ```{r}
+#根據條件選出後，由小到大排序並選出最後10個
 tail(sort(tapply(CPS$Race == "Asian", CPS$MetroArea, mean)),10)
 
 ```
@@ -262,6 +265,7 @@ and Vallejo-Fairfield, CA
 
 __§ 3.6__  Passing na.rm=TRUE to the tapply function, determine which metropolitan area has the smallest proportion of interviewees who have received no high school diploma.
 ```{r}
+#根據條件選出後，由小到大排序並選出前10個
 sort(tapply(CPS$Education == "No high school diploma", CPS$MetroArea, mean, na.rm=TRUE))%>%head
 ```
 Iowa City 2.9%
@@ -274,6 +278,7 @@ Iowa City 2.9%
 
 __§ 4.1__ What is the name of the variable added to the CPS data frame by this merge operation?
 ```{r}
+#合併CPS中的CountryOfBirthCode欄和CountryMap中的Code欄，保留前者的全部欄位，並檢視資料
 CPS = merge(CPS, CountryMap, by.x="CountryOfBirthCode", by.y="Code", all.x=TRUE)
 summary(CPS)
 ```
@@ -282,6 +287,7 @@ country
 
 How many interviewees have a missing value for the new metropolitan area variable?
 ```{r}
+#檢視新欄位中的缺漏值
 summary(CPS)
 ```
 country's NA's =176
@@ -289,13 +295,15 @@ country's NA's =176
 
 __§ 4.2__ Among all interviewees born outside of North America, which country was the most common place of birth?
 ```{r}
+#用表格列出後由小到大排序並取最後10個國家
 sort(table(CPS$Country))%>%tail(10)
 ```
-Philippines 839
+Philippines 839 是美洲外最多的國家
 
 
 __§ 4.3__ What proportion of the interviewees from the "New York-Northern New Jersey-Long Island, NY-NJ-PA" metropolitan area have a country of birth that is not the United States? 
 ```{r}
+#由MetroArea欄位中只選出上述大都會地區的受面試者數據，再進行比率計算
 table(CPS$MetroArea == "New York-Northern New Jersey-Long Island, NY-NJ-PA", CPS$Country != "United States")
 
 1668/(1668+3736)
@@ -305,6 +313,7 @@ table(CPS$MetroArea == "New York-Northern New Jersey-Long Island, NY-NJ-PA", CPS
 
 __§ 4.4__ Which metropolitan area has the largest number (note -- not proportion) of interviewees with a country of birth in India? 
 ```{r}
+#根據題目條件選出並由小到大排序，再選出最後10筆資料
 tapply(CPS$Country=="India",CPS$MetroArea,sum,na.rm=TRUE)%>%sort%>%tail(10)
 ```
 New York
@@ -312,12 +321,14 @@ New York
 
 In Brazil?
 ```{r}
+#根據題目條件選出並由小到大排序，再選出最後10筆資料
 tapply(CPS$Country=="Brazil",CPS$MetroArea,sum,na.rm=TRUE)%>%sort%>%tail(10)
 ```
 Boston
 
 In Somalia?
 ```{r}
+#根據題目條件選出並由小到大排序，再選出最後10筆資料
 sort(tapply(CPS$Country == "Somalia", CPS$MetroArea, sum, na.rm=TRUE))%>%tail(10)
 ```
 Minneapolis
