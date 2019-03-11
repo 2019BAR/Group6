@@ -1,6 +1,6 @@
 ---
 title: "AS3-2: 股市動態"
-author: "第 0 組"
+author: "第 6 組"
 date: "`r Sys.time()`"
 output:
   html_document:
@@ -50,7 +50,6 @@ pacman::p_load(dplyr)
 
 __§ 1.1__ Our five datasets all have the same number of observations. How many observations are there in each data set?
 ```{r}
-<<<<<<< HEAD
 #讀取五個檔案
 IBM=read.csv("data/IBMStock.csv")
 GE=read.csv("data/GEStock.csv")
@@ -59,27 +58,11 @@ CocaCola=read.csv("data/CocaColaStock.csv")
 Boeing=read.csv("data/BoeingStock.csv")
 #計算number of row
 nrow(IBM)
-=======
-IBM=read.csv('data/IBMStock.csv')
-GE=read.csv('data/GEStock.csv')
-ProcterGamble=read.csv('data/ProcterGambleStock.csv')
-CocaCola=read.csv('data/CocaColaStock.csv')
-Boeing=read.csv('data/BoeingStock.csv')
-
-IBM$Date=as.Date(IBM$Date,"%m/%d/%y")
-GE$Date=as.Date(GE$Date,"%m/%d/%y")
-ProcterGamble$Date=as.Date(ProcterGamble$Date,"%m/%d/%y")
-CocaCola$Date=as.Date(CocaCola$Date,"%m/%d/%y")
-Boeing$Date=as.Date(Boeing$Date,"%m/%d/%y")
-#
-#
->>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
-
+480 observations
 
 __§ 1.2__ What is the earliest year in our datasets?
 ```{r}
-<<<<<<< HEAD
 #先將Date欄位屬性從factor轉成date
 IBM$Date = as.Date(IBM$Date, "%m/%d/%y")
 GE$Date = as.Date(GE$Date, "%m/%d/%y")
@@ -90,85 +73,50 @@ Boeing$Date = as.Date(Boeing$Date, "%m/%d/%y")
 IBM$Date[which.min(IBM$Date)]
 #另一種寫法
 min(IBM$Date) 
-=======
-IBM$Date[which.min(IBM$Date)]
-min(IBM$Date)#也是可以
-#
-#
->>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
+1970
 
 __§ 1.3__ What is the latest year in our datasets?
 ```{r}
-<<<<<<< HEAD
 #找出最晚的年份
 IBM$Date[which.max(IBM$Date)]
-=======
-max(IBM$Date)
-#
-#
->>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
+2009
 
 __§ 1.4__ What is the mean stock price of IBM over this time period?
 ```{r}
-<<<<<<< HEAD
 #IBM的平均股價
 mean(IBM$StockPrice) #144.4
-=======
-mean(IBM$StockPrice)
-#
-#
->>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
+mean:144.4
 
 __§ 1.5__ What is the minimum stock price of General Electric (GE) over this time period?
 ```{r}
-<<<<<<< HEAD
 #GE的股價最小值
 min(GE$StockPrice) #9.294
-=======
-min(GE$StockPrice)
-#
-#
->>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
+min:9.294
 
 __§ 1.6__ What is the maximum stock price of Coca-Cola over this time period?
 ```{r}
-<<<<<<< HEAD
 #Coca Cola的股價最大值
 max(CocaCola$StockPrice) #146.6
-=======
-max(CocaCola$StockPrice)
-#
-#
->>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
+max:146.6
 
 __§ 1.7__ What is the median stock price of Boeing over this time period?
 ```{r}
-<<<<<<< HEAD
 #Boeing的股價中位數
 median(Boeing$StockPrice) #44.88
-=======
-median(Boeing$StockPrice)
-#
-#
->>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
+median:44.88
 
 __§ 1.8__ What is the standard deviation of the stock price of Procter & Gamble over this time period?
 ```{r}
-<<<<<<< HEAD
 #Procter & Gamble的股價標準差
 sd(ProcterGamble$StockPrice) #18.19
-=======
-sd(ProcterGamble$StockPrice)
-#
-#
->>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
+sd:18.19
 
 <br><hr>
 
@@ -176,70 +124,38 @@ sd(ProcterGamble$StockPrice)
 
 __§ 2.1__ Around what year did Coca-Cola has its highest stock price in this time period? Around what year did Coca-Cola has its lowest stock price in this time period?
 ```{r}
-<<<<<<< HEAD
 #X軸為年份，y軸為股價
 plot(CocaCola$Date,CocaCola$StockPrice,type="l")
 ```
 <br>highest year: 1973, lowest year: 1980
-=======
-plot(CocaCola$Date,CocaCola$StockPrice,type="l")
-
-#
-#
-```
-
->>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 
 __§ 2.2__ In March of 2000, the technology bubble burst, and a stock market crash occurred. According to this plot, which company's stock dropped more?
 ```{r}
 #Coca cola為紅色線
 plot(CocaCola$Date,CocaCola$StockPrice,type="l",col="red")
-<<<<<<< HEAD
 #Procter & Gamble為藍色線
 lines(ProcterGamble$Date, ProcterGamble$StockPrice,col="blue")
 #在2000年三月加一條綠色虛線
 abline(v=as.Date(c("2000-03-01")), lwd=2, lty=2, col="green")
 ```
 <br>ProcterGamble (藍色線) dropped more.
-=======
-lines(ProcterGamble$Date,ProcterGamble$StockPrice,col="blue",lty=2)
-abline(v=as.Date(c("2000-03-01")),lwd=2)
-#
-#
-```
->>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 
 __§ 2.3__ (a) Around 1983, the stock for one of these companies (Coca-Cola or Procter and Gamble) was going up, while the other was going down. Which one was going up? 
 ```{r}
 #Coca cola為紅色線
 plot(CocaCola$Date,CocaCola$StockPrice,type="l",col="red")
-<<<<<<< HEAD
 #Procter & Gamble為藍色線
 lines(ProcterGamble$Date, ProcterGamble$StockPrice,col="blue")
 #在1983年加一條綠色虛線
 abline(v=as.Date(c("1983-01-01")), lwd=2, lty=2,col="green")
-=======
-lines(ProcterGamble$Date,ProcterGamble$StockPrice,col="blue",lty=2)
-abline(v=as.Date(c("1983-01-01")),lwd=2)
-#程式碼 下 zoom
-#
->>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 <br>Coca Cola (紅色線) 的股價上升
 
 (b) In the time period shown in the plot, which stock generally has lower values?
 ```{r}
-plot(CocaCola$Date,CocaCola$StockPrice,type="l",col="red")
-lines(ProcterGamble$Date,ProcterGamble$StockPrice,col="blue",lty=2)
-abline(v=as.Date(c("1983-01-01")),lwd=2)
-#cocacola red point
-#
+# same as the plot above
 ```
-<<<<<<< HEAD
 <br>Coca-Cola has lower values
-=======
-
->>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 
 <br><hr>
 
@@ -247,7 +163,6 @@ abline(v=as.Date(c("1983-01-01")),lwd=2)
 
 __§ 3.1__ Which stock fell the most right after the technology bubble burst in March 2000?
 ```{r}
-<<<<<<< HEAD
 which(CocaCola$Date=="1995-01-01") #1995年從301row開始
 which(CocaCola$Date=="2005-12-01") #2005年到第432row結束
 plot(CocaCola$Date[301:432], CocaCola$StockPrice[301:432], type="l", col="red", ylim=c(0,210))
@@ -262,35 +177,12 @@ abline(v=as.Date(c("2000-03-01")), lwd=2, col="gray",lty=2)
 #lty = 2:dashed, 3:dotted, 4:alternate between dashes and dots, 5:long-dashed
 ```
 <br>GE fell the most.
-=======
-plot(CocaCola$Date,CocaCola$StockPrice,type="l",col="red")
-lines(ProcterGamble$Date,ProcterGamble$StockPrice,col="blue",lty=1)
-lines(Boeing$Date,Boeing$StockPrice,col="yellow",lty=1)
-lines(GE$Date,GE$StockPrice,col="green",lty=1)
-lines(IBM$Date,IBM$StockPrice,col="purple",lty=1)
-abline(v=as.Date(c("2000-03-01")),lwd=2)
-#
-#
-```
->>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 
 __§ 3.2__ Which stock reaches the highest value in the time period 1995-2005?
 ```{r}
-which(CocaCola$Date=="1995-01-01")
-which(CocaCola$Date=="2005-12-01")
-plot(CocaCola$Date[301:432],CocaCola$StockPrice[301:432],type="l",col="red",ylim = c(0,210))
-lines(ProcterGamble$Date[301:432],ProcterGamble$StockPrice[301:432],col="blue",lty=1,ylim = c(0,210))
-lines(Boeing$Date[301:432],Boeing$StockPrice[301:432],col="yellow",lty=1,ylim = c(0,210))
-lines(GE$Date[301:432],GE$StockPrice[301:432],col="green",lty=1,ylim = c(0,210))
-lines(IBM$Date[301:432],IBM$StockPrice[301:432],col="purple",lty=1,ylim = c(0,210))
-abline(v=as.Date(c("2000-03-01")),lwd=2)
-#lty=2,3,4,5
-#col=red,blue,green,purple,black,orange,yellow
-#ylim= 是y軸範圍的控制
-#ans=GE
-#ans=IBM
+# see the graph above
+#green:IBM
 ```
-<<<<<<< HEAD
 <br>IBM reaches the highest value.
 
 __§ 3.3__ In October of 1997, there was a global stock market crash that was caused by an economic crisis in Asia. Comparing September 1997 to November 1997, which companies saw a decreasing trend in their stock price? (Select all that apply.)
@@ -320,38 +212,6 @@ abline(v=as.Date(c("2005-01-01")), lwd=2)
 #orange:Boeing
 ```
 <br>Boeing increased stock price.
-=======
-
-__§ 3.3__ In October of 1997, there was a global stock market crash that was caused by an economic crisis in Asia. Comparing September 1997 to November 1997, which companies saw a decreasing trend in their stock price? (Select all that apply.)
-```{r}
-which(CocaCola$Date=="1997-09-01")
-which(CocaCola$Date=="1997-11-01")
-plot(CocaCola$Date[333:335],CocaCola$StockPrice[333:335],type="l",col="red",ylim = c(45,120))
-lines(ProcterGamble$Date[333:335],ProcterGamble$StockPrice[333:335],col="blue",lty=1,ylim = c(45,120))
-lines(Boeing$Date[333:335],Boeing$StockPrice[333:335],col="yellow",lty=1,ylim = c(45,120))
-lines(GE$Date[333:335],GE$StockPrice[333:335],col="green",lty=1,ylim = c(45,120))
-lines(IBM$Date[333:335],IBM$StockPrice[333:335],col="purple",lty=1,ylim = c(45,120))
-abline(v=as.Date(c("1997-10-01")),lwd=2)
-#blue=ProcterGamble
-#yellow=Boeing
-```
-
-__§ 3.4__ In the last two years of this time period (2004 and 2005) which stock seems to be performing the best, in terms of increasing stock price?
-```{r}
-which(CocaCola$Date=="1995-01-01")
-which(CocaCola$Date=="2005-12-01")
-plot(CocaCola$Date[301:432],CocaCola$StockPrice[301:432],type="l",col="red",ylim = c(0,210))
-lines(ProcterGamble$Date[301:432],ProcterGamble$StockPrice[301:432],col="blue",lty=1,ylim = c(0,210))
-lines(Boeing$Date[301:432],Boeing$StockPrice[301:432],col="yellow",lty=1,ylim = c(0,210))
-lines(GE$Date[301:432],GE$StockPrice[301:432],col="green",lty=1,ylim = c(0,210))
-lines(IBM$Date[301:432],IBM$StockPrice[301:432],col="purple",lty=1,ylim = c(0,210))
-abline(v=as.Date(c("2004-01-01")),lwd=2)
-abline(v=as.Date(c("2005-01-01")),lwd=2)
-#ans=Boieng
-
-```
-
->>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 
 <br><hr>
 
@@ -360,41 +220,25 @@ abline(v=as.Date(c("2005-01-01")),lwd=2)
 
 __§ 4.1__ For IBM, compare the monthly averages to the overall average stock price. In which months has IBM historically had a higher stock price (on average)? Select all that apply.
 ```{r}
-tapply(IBM$StockPrice,months(IBM$Date),mean)%>%sort
-mean(IBM$StockPrice)
-
-#sort做順序
-# use 大於
+tapply(IBM$StockPrice,months(IBM$Date),mean) %>%sort
+mean(IBM$StockPrice) # 144.4
+#January<May<April<March<February 
 ```
-<<<<<<< HEAD
 <br>February, March, April, May, January have higher stock price than average(144.4).
-=======
->>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 
 __§ 4.2__ General Electric and Coca-Cola both have their highest average stock price in the same month. Which month is this?
 ```{r}
-tapply(GE$StockPrice,months(GE$Date),mean)%>%sort
-tapply(CocaCola$StockPrice,months(CocaCola$Date),mean)%>%sort
-
-#
-#
+tapply(GE$StockPrice,months(GE$Date),mean) %>%sort
+tapply(CocaCola$StockPrice,months(CocaCola$Date),mean) %>%sort
+#April
 ```
 <br>General Electric and Coca-Cola both have their highest average stock price in April.
 
 __§ 4.3__ For the months of December and January, every company's average stock is higher in one month and lower in the other. In which month are the stock prices lower?
 ```{r}
-tapply(GE$StockPrice,months(GE$Date),mean)%>%sort
-tapply(CocaCola$StockPrice,months(CocaCola$Date),mean)%>%sort
-tapply(IBM$StockPrice,months(IBM$Date),mean)%>%sort
-tapply(ProcterGamble$StockPrice,months(ProcterGamble$Date),mean)%>%sort
-tapply(Boeing$StockPrice,months(Boeing$Date),mean)%>%sort
-#
-#
+tapply(GE$StockPrice,months(GE$Date),mean) %>%sort
 ```
-<<<<<<< HEAD
 <br>The stock prices are lower in December.
-=======
->>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 
 <br><br><br>
 
