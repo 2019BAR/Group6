@@ -1,6 +1,10 @@
 ---
 title: "AS3-1: 數位偵探"
+<<<<<<< HEAD
 author: "第 6 組"
+=======
+author: "第 0 組"
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 date: "`r Sys.time()`"
 output: 
   html_document:
@@ -46,6 +50,7 @@ pacman::p_load(dplyr, d3heatmap)
 
 【1.1】How many rows of data (observations) are in this dataset?
 ```{r}
+<<<<<<< HEAD
 mvt = read.csv("data/mvtWeek1.csv", stringsAsFactors=F)
 nrow(mvt)
 ```
@@ -54,38 +59,83 @@ nrow(mvt)
 檢查各欄位的資料格式
 ```{r}
 summary(mvt)
+=======
+WHO=read.csv("data/mvtWeek1.csv")
+#
+```
+
+檢查各欄位的資料格式
+```{r}
+ncol(WHO)
+#ncol = 欄位
+
+nrow(WHO)
+#nrow = 記錄
+
+summary(WHO)
+#資料總覽
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 類別(Factor) versus 字串(Character)
 
 【1.2】How many variables are in this dataset?
 ```{r}
+<<<<<<< HEAD
 ncol(mvt)
+=======
+ncol(WHO)
+#多少變數欄位？（物件）
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 
 【1.3】Using the "max" function, what is the maximum value of the variable "ID"?
 ```{r}
+<<<<<<< HEAD
 max(mvt$ID)
+=======
+which.max(WHO$ID)
+#找出ID變數的最大值為何
+WHO[18134,]
+#顯示記錄18134（位置） 的所有變數資料（物件）
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 
 【1.4】 What is the minimum value of the variable "Beat"?
 ```{r}
+<<<<<<< HEAD
 min(mvt$Beat)
+=======
+which.min(WHO$Beat)
+#顯示記錄位置
+WHO[4756,]
+#透過記錄位置找出資料
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 
 【1.5】 How many observations have value TRUE in the Arrest variable (this is the number of crimes for which an arrest was made)?
 ```{r}
+<<<<<<< HEAD
 summary(mvt)
 sum(mvt$Arrest)
 #mean(mvt$Arrest)
+=======
+table(WHO$Arrest)
+#使用table做分類計算
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 【1.6】 How many observations have a LocationDescription value of ALLEY?
 ```{r}
+<<<<<<< HEAD
 sum(mvt$LocationDescription == "ALLEY")
+=======
+table(WHO$LocationDescription =="ALLEY")
+#利用==""搜索名稱
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 
@@ -97,6 +147,7 @@ sum(mvt$LocationDescription == "ALLEY")
 
 【2.1】 In what format are the entries in the variable Date?
 
+<<<<<<< HEAD
 Month/Day/Year Hour:Minute
 
 ```{r}
@@ -122,33 +173,114 @@ library(d3heatmap)
 table(format(ts,"%u"), format(ts,"%H")) %>% 
   as.data.frame.matrix %>% 
   d3heatmap(F,F,col=colorRamp(c('seagreen','lightyellow','red')))
+=======
++ Month/Day/Year Hour:Minute
++ Day/Month/Year Hour:Minute
++ Hour:Minute Month/Day/Year
++ Hour:Minute Day/Month/Year
+
+```{r}
+head(WHO$Date)
+#顯示資料框中的時間
+```
+
+```{r}
+ts=as.POSIXct(WHO$Date,format="%m/%d/%y %H:%M")
+#as.Date(strptime(WHO$Date,"%m/%d/%y %H:%M"))
+#先建立一個新的時間物件，把原檔的時間存入新物件
+
+```
+
+```{r}
+table(format(ts,"%u"))
+table(format(ts,"%m"))
+table(weekday=format(ts,"%u"),month=format(ts,"%m"))
+#透過table將ts的format更改為我們想要的格式
+```
+
+```{r fig.height=2.5, fig.width=8}
+table(format(ts,"%u"), format(ts,"%H")) %>% 
+  as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('seagreen','lightyellow','red')))
+
+table(format(ts,"%u"), format(ts,"%H")) %>% 
+  as.data.frame.matrix %>% 
+  d3heatmap(T,T,col=colorRamp(c('seagreen','lightyellow','red')))
+
+table(format(ts,"%u"), format(ts,"%H")) %>% 
+  as.data.frame.matrix %>% 
+  d3heatmap(T,F,col=colorRamp(c('seagreen','lightyellow','red')))
+
+table(format(ts,"%u"), format(ts,"%H")) %>% 
+  as.data.frame.matrix %>% 
+  d3heatmap(F,T,col=colorRamp(c('seagreen','lightyellow','red')))
+
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 
 【2.2】 What is the month and year of the median date in our dataset? 
 ```{r}
+<<<<<<< HEAD
 DateConvert = as.Date(strptime(mvt$Date, "%m/%d/%y %H:%M"))
 # ts = as.POSIXct(mvt$Date, format="%m/%d/%y %H:%M")
 summary(DateConvert)
 median(DateConvert)
+=======
+summary(ts)
+median(ts)
+#
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 【2.3】 In which month did the fewest motor vehicle thefts occur?
 ```{r}
+<<<<<<< HEAD
 mvt$Month = months(DateConvert)
 mvt$Weekday = weekdays(DateConvert)
 mvt$Date = DateConvert
 sort(table(mvt$Month))
+=======
+sort(table(format(ts,"%m")))
+#月份去排序（少到多），哪個犯罪率最高
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 【2.4】 On which weekday did the most motor vehicle thefts occur?
 ```{r}
+<<<<<<< HEAD
 sort(table(mvt$Weekday))
+=======
+
+max(table(format(ts,"%w")))
+#星期中的最大值是多少？
+
+which.max(table(format(ts,"%w")))
+#最大值的星期為何？（%w：5，6 因為order與sort的緣故， %u：5，5）
+#因此which.max會先呈現出sort，之後才是order
+
+table(format(ts,"%w"))%>%order
+#order只會顯示最大值的位置排名順序
+
+table(format(ts,"%w"))%>%sort
+#而sort則連同排名位置及記錄一同顯現
+
+
+
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 【2.5】 Which month has the largest number of motor vehicle thefts for which an arrest was made?
 ```{r}
+<<<<<<< HEAD
 table(mvt$Arrest,mvt$Month)
+=======
+table(WHO$Arrest)
+table(format(ts[WHO$Arrest],"%m"))%>%sort
+
+#我知道被捉的資料可是要如何得知其中哪個月捉得最多的呢？
+#若要得知這份資料
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 <br><br>
@@ -159,15 +291,27 @@ table(mvt$Arrest,mvt$Month)
 
 【3.1】 (a) In general, does it look like crime increases or decreases from 2002 - 2012? (b) In general, does it look like crime increases or decreases from 2005 - 2008? (c) In general, does it look like crime increases or decreases from 2009 - 2011?
 ```{r}
+<<<<<<< HEAD
 hist(ts,'year',las=2)
 # 2002~2012 : decrease
 # 2005~2008 : decrease
 # 2009~2011 : increase
 hist(mvt$Date, breaks=100)
+=======
+hist(ts,'year',las=0)
+hist(ts,'year',las=1)
+hist(ts,'year',las=2)
+hist(ts,'year',las=3)
+#2002 - 2012 = decrease
+#2005 - 2008 = decrease
+#2009 - 2011 = increase
+#las 的差別在於x與y軸的變數名稱是否垂直於坐標軸又或是平行於坐標軸（主要是會影響我們觀察數據：一般會使用2(y:直,x:直)）
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 【3.2】 Does it look like there were more crimes for which arrests were made in the first half of the time period or the second half of the time period?
 ```{r}
+<<<<<<< HEAD
 table(ts > as.POSIXct("2007-01-01"))
 # first half
 boxplot(mvt$Date ~ mvt$Arrest)
@@ -177,16 +321,40 @@ Arrest=TRUE is definitely skewed towards the bottom of the plot, meaning that th
 【3.3】 For what proportion of motor vehicle thefts in 2001 was an arrest made?
 ```{r}
 round(prop.table(table(mvt$Arrest, mvt$Year),2),3)
+=======
+hist(ts[WHO$Arrest],'year',las=2)
+#ans = first half of the time period
+
+```
+
+【3.3】 For what proportion of motor vehicle thefts in 2001 was an arrest made?
+```{r}
+table(WHO$Arrest, format(ts,'%Y')) %>% prop.table(2) %>% round(3) # 0.104
+round(prop.table(table(WHO$Arrest,format(ts,'%Y')),margin=2),digits=3) 
+#以上兩者皆可，利用管線可能會更簡便一些！
+#prop.table是比例的計算 分別是(2)是每個『欄』的計算（年比例），而(1)則是每個『列』的計算（逮捕效率）
+#round則是小數點幾位數
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 【3.4】 For what proportion of motor vehicle thefts in 2007 was an arrest made?
 ```{r}
+<<<<<<< HEAD
 round(prop.table(table(mvt$Arrest, mvt$Year),2),3)
+=======
+#查看3.3表
+#0.085
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 【3.5】 For what proportion of motor vehicle thefts in 2012 was an arrest made?
 ```{r}
+<<<<<<< HEAD
 round(prop.table(table(mvt$Arrest, mvt$Year),2),3)
+=======
+#查看3.3表
+#0.039
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 <br><br>
@@ -198,33 +366,65 @@ round(prop.table(table(mvt$Arrest, mvt$Year),2),3)
 【4.1】 Which locations are the top five locations for motor vehicle thefts, excluding the "Other" category? You should select 5 of the following options.
 
 ```{r}
+<<<<<<< HEAD
 sort(table(mvt$LocationDescription)) %>% tail()
+=======
+table(WHO$LocationDescription)%>%sort%>%tail(6)
+
+#先是整理再將尾數捉出來
+
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 【4.2】 How many observations are in Top5?
 ```{r}
+<<<<<<< HEAD
 #1
 Top5 = subset(mvt, LocationDescription=="STREET" | LocationDescription=="PARKING LOT/GARAGE(NON.RESID.)" | LocationDescription=="ALLEY" | LocationDescription=="GAS STATION" | LocationDescription=="DRIVEWAY - RESIDENTIAL")
 str(Top5)
 #2
 TopLocations = c("STREET", "PARKING LOT/GARAGE(NON.RESID.)", "ALLEY", "GAS STATION", "DRIVEWAY - RESIDENTIAL")
 Top5 = subset(mvt, LocationDescription %in% TopLocations)
+=======
+(top5=names(table(WHO$LocationDescription)%>%sort%>%tail(6))[-4])
+sum((WHO$LocationDescription)%in%top5)
+
+#外加()可以直接顯示計算結果，names=只列出名字，[-4]刪去第四項（注意負號要放在中括號裡頭）
+#%in% 前者的運算通過後者的架構輸出答案
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 【4.3】 One of the locations has a much higher arrest rate than the other locations. Which is it? 
 ```{r}
+<<<<<<< HEAD
 Top5$LocationDescription = factor(Top5$LocationDescription)
 prop.table(table(Top5$LocationDescription,Top5$Arrest),1)
+=======
+TOP5 = subset(WHO, LocationDescription %in% top5)
+tapply(TOP5$Arrest, TOP5$LocationDescription, mean) %>% sort
+#
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 【4.4】 On which day of the week do the most motor vehicle thefts at gas stations happen?
 ```{r}
+<<<<<<< HEAD
 table(Top5$LocationDescription, Top5$Weekday)
+=======
+ts[WHO$Location == "GAS STATION"] %>% format('%w') %>% table %>% sort
+#
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 【4.5】 On which day of the week do the fewest motor vehicle thefts in residential driveways happen?
 ```{r}
+<<<<<<< HEAD
 table(Top5$LocationDescription, Top5$Weekday)
+=======
+ts[WHO$Location == "DRIVEWAY - RESIDENTIAL"] %>% 
+  format('%w') %>% table %>% sort
+#
+>>>>>>> 29cb088a8bb7ef96191f373d87d43a8f8c70e434
 ```
 
 
