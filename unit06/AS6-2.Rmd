@@ -111,7 +111,7 @@ if(input$rug) rug(D)
 &emsp;<font color=steelblue> 0.5，使用平滑模型累計機率函數貼近數值標記，之後做 平滑密度函數曲線的調整，越小自然更接近數據值，但曲線會看起來較為陡峭而過適而造成誤差。 </font><br>
 &emsp;■ 調高欄寬和頻寬會讓模型變複雜，還是變簡單呢？<br>
 &emsp;<font color=steelblue> 調高欄寬(bandwidth)變複雜，直方圖會呈現超出預設範圍與高低呈現不規律，<br>
-調高平寬(binwidth)變簡單，平滑模型累計機率函數因乏適應(Underfitting)而呈現平緩與數據值相差甚遠。 </font><br>
+調高平寬(binwidth)變簡單，平滑模型累計機率函數因乏適(underfitting)而呈現平緩與數據值相差甚遠。 </font><br>
 &emsp;■ 模型越複雜，它跟實際值之間的誤差是越大、還是越小？<br>
 &emsp;<font color=steelblue> 直方模型複雜時，誤差大，直方圖會呈顯凹凸的次序而影響到我們的觀察。<br> 平滑模型複雜時，誤差大，因為過於接近數據值而產生過適（overfitting）的情況，但卻與實際狀況卻差很多。</font><br>
 &emsp;■ 那麼，越複雜的模型就會越準，對嗎？<br>
