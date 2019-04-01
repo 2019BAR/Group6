@@ -23,7 +23,7 @@ if(!require(pacman)) install.packages("pacman")
 pacman::p_load(dplyr)
 ```
 
-### <span style="font-size:22px">`r "\U1F4A1"` 學習重點：</span>  {data-height=250}
+### <span style="font-size:22px">`r "\U1F4D6"` 學習重點：</span>  {data-height=250}
 <p class="wwl">
 【A】從第五周的「[有獎徵答](https://gtonychuo.github.io/2019RPB/unit05/quiz05.html)」我們學到使用`頻率`、`密度`和`機率`來表示`隨機變數`的`分布`<br>
 &emsp;■ 分布：變數的值所出現的頻率<br>
@@ -55,7 +55,7 @@ pacman::p_load(dplyr)
 </p class="wwl">
 
 
-### <span style="font-size:22px">`r "\U1F5FF"` 問題討論：</span>  {data-height=250}
+### <span style="font-size:22px">`r "\U1F4E2"` 問題討論：</span>  {data-height=250}
 <p class="qiz">
 【A.選擇方法】<br>
 &emsp;■ 我們為甚麼需要隨機變數？ 什麼時候我們需要用到隨機變數？<br>
@@ -169,7 +169,7 @@ PROB
 <br><br>
 
 
-【D.預測與決策】<br>
+`r "\U1F4B5"``r "\U1F4B6"``r "\U1F4B7"``r "\U1F4B8"`【D.預測與決策】`r "\U1F4B5"``r "\U1F4B6"``r "\U1F4B7"``r "\U1F4B8"`<br>
 假設有一個賭局，你可以花30元選定一個連續60秒的時段，如果老忠實下一次的噴發時間落在你指定的區間，你就可以贏到100元；請你使用頻寬為`0.5`的平滑密度模型 ...<br>
 &emsp;■ 決定要不要參加這個賭局<br>
 &emsp;<font color=steelblue> 要參加，以試驗10000000次下，每一局平均可以獲得18元 </font><br>

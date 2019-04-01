@@ -240,20 +240,20 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">資料案例：老忠實</h1>
 <h4 class="author"><em>第 6 組</em></h4>
-<h4 class="date"><em>2019-04-01 15:45:05</em></h4>
+<h4 class="date"><em>2019-04-01 16:25:43</em></h4>
 
 </div>
 
 
 <p>組員： <code>B035040052 林榮鏵</code> <code>B045020041諶彥汝</code> <code>B056090039 楊禾馨</code> <code>M064020056 閻俞蓉</code> <code>M064111003 洪筱涵</code> <code>M074111035 劉志峰</code></p>
 <div class="section level3" data-height="250">
-<h3><span style="font-size:22px">💡 學習重點：</span></h3>
+<h3><span style="font-size:22px">📖 學習重點：</span></h3>
 <p class="wwl">
 【A】從第五周的「<a href="https://gtonychuo.github.io/2019RPB/unit05/quiz05.html">有獎徵答</a>」我們學到使用<code>頻率</code>、<code>密度</code>和<code>機率</code>來表示<code>隨機變數</code>的<code>分布</code><br>  ■ 分布：變數的值所出現的頻率<br>  ■ 連續變數的分布有三種表達方式：次數(頻率)、密度、機率<br>  ■ <code>連續變數</code>和<code>離散變數</code>的分布的表達方式是不一樣的<br> <br> 【B】從這一份練習，我們學到：<br>  ■ 平均值、標準差等<code>統計量</code>可以表達隨機變數的概況，但它們無法完整表示隨機變數的分布<br>  ■ 透過<code>圖形</code>或<code>數學函數</code>，我們才能清楚地表示和運算(估計、預測)隨機變數的分布<br>  ■ <code>模型</code>：將現實抽象化(Abstract of Reality)，使其好懂(好溝通)或好計算<br>  ■ 圖形和數學函數都可以用來表示隨機變數的分布，前者好懂，後者方便運算<br>  ■ <code>數值標記</code>、<code>直方圖</code>和<code>平滑密度曲線</code>都可以寫成<code>機率密度函數(PDF)</code><br>  ■ 數值標記和直方圖的函數形式比較複雜，也容易有量化誤差<br>  ■ 因此平滑密度曲線通常比較適合用來表示連續變數的分布<br>  ■ 機率密度函數(PDF)積分之後就可以得到<code>累計機率函數(CDF)</code>，前者好懂，後者好算<br> <br> 【C】資料、模型、方法、參數：<br>  ■ 透過調整<code>方法參數</code>，同一份資料用同一種<code>方法</code>可以做出不同的<code>模型</code><br>  ■ 通常模型越複雜，它跟訓練資料之間的誤差就越小<br>  ■ 但是模型太複雜就會失去一般性，反而不能夠準確的估計訓練資料以外的對象<br>  ■ 所以我們需要用方法參數來控制分析方法的複雜度，避免<code>過度適配</code>(<code>over fitting</code>)<br> <br> 【D】估計機率的程序：<br>  ■ 選擇分析方法<br>  ■ 藉由調整方法參數盡量找出最適(PDF)模型<br>  ■ 透過積分，從PDF求出CDF<br>  ■ 根據變數的範圍，從CDF求出機率<br> <br>
 </p>
 </div>
 <div class="section level3" data-height="250">
-<h3><span style="font-size:22px">🗿 問題討論：</span></h3>
+<h3><span style="font-size:22px">📢 問題討論：</span></h3>
 <p class="qiz">
 <p>【A.選擇方法】<br>  ■ 我們為甚麼需要隨機變數？ 什麼時候我們需要用到隨機變數？<br>  <font color="steelblue"> 隨機變數是一個不確定性事件結果的數值函數，把不確定性事件的結果用數值來表示。<br>  當需要很大的樣本空間，或是要預測未來結果，或是沒有辦法取得正確數值的時候，需要使用隨機變數。</font><br>  ■ 隨機變數沒有固定的值，那我們要如何做計算呢？<br>  <font color="steelblue"> 透過隨機變數相關統計量來進行計算，平均值、標準差等都可以表達隨機變數的概況，<br>  在R可以使用sample()，runif()，rnorm()等函數。 </font><br>  ■ 我們可以用直方圖或數值標記來估計噴發時間落在某一區間的機率嗎？<br>  <font color="steelblue"> 可以，透過rug函數，計算資料中的數值並標記在x軸上（噴發時間），之後再積分，把積分曲線圖畫出來。 <br></font></p>
 <pre><code>#eruptions 噴發時間與機率次數關係圖
@@ -300,8 +300,8 @@ PROB =<span class="st"> </span><span class="kw">integrate</span>(PDF, <span clas
 <span class="kw">library</span>(flexdashboard)
 <span class="kw">gauge</span>(<span class="kw">round</span>(<span class="dv">100</span><span class="op">*</span>PROB,<span class="dv">2</span>), <span class="dt">min =</span> <span class="dv">0</span>, <span class="dt">max =</span> <span class="dv">100</span>, <span class="dt">symbol =</span> <span class="st">'%'</span>, <span class="kw">gaugeSectors</span>(
       <span class="dt">success =</span> <span class="kw">c</span>(<span class="dv">41</span>, <span class="dv">100</span>), <span class="dt">warning =</span> <span class="kw">c</span>(<span class="dv">21</span>, <span class="dv">40</span>), <span class="dt">danger =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">20</span>)) )</code></pre></div>
-<div id="htmlwidget-41dd0c2b33d0afc86748" style="width:672px;height:480px;" class="gauge html-widget"></div>
-<script type="application/json" data-for="htmlwidget-41dd0c2b33d0afc86748">{"x":{"value":26.85,"min":0,"max":100,"customSectors":[{"lo":41,"hi":100,"color":"success"},{"lo":21,"hi":40,"color":"warning"},{"lo":0,"hi":20,"color":"danger"}],"symbol":"%","label":null,"humanFriendly":true,"humanFriendlyDecimal":1,"href":null},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-98e1ea59dcaf0b7bd94e" style="width:672px;height:480px;" class="gauge html-widget"></div>
+<script type="application/json" data-for="htmlwidget-98e1ea59dcaf0b7bd94e">{"x":{"value":26.85,"min":0,"max":100,"customSectors":[{"lo":41,"hi":100,"color":"success"},{"lo":21,"hi":40,"color":"warning"},{"lo":0,"hi":20,"color":"danger"}],"symbol":"%","label":null,"humanFriendly":true,"humanFriendlyDecimal":1,"href":null},"evals":[],"jsHooks":[]}</script>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">PROB</code></pre></div>
 <pre><code>[1] 0.2685</code></pre>
 <p> ■ 將頻寬調整參數設為<code>0.5</code>，算出等待時間落在80到90之間的機率<br></p>
@@ -310,12 +310,12 @@ PDF =<span class="st"> </span><span class="kw">approxfun</span>(DEN<span class="
 PROB =<span class="st"> </span><span class="kw">integrate</span>(PDF, <span class="dv">80</span>, <span class="dv">90</span>)<span class="op">$</span>value
 <span class="kw">gauge</span>(<span class="kw">round</span>(<span class="dv">100</span><span class="op">*</span>PROB,<span class="dv">2</span>), <span class="dt">min =</span> <span class="dv">0</span>, <span class="dt">max =</span> <span class="dv">100</span>, <span class="dt">symbol =</span> <span class="st">'%'</span>, <span class="kw">gaugeSectors</span>(
       <span class="dt">success =</span> <span class="kw">c</span>(<span class="dv">41</span>, <span class="dv">100</span>), <span class="dt">warning =</span> <span class="kw">c</span>(<span class="dv">21</span>, <span class="dv">40</span>), <span class="dt">danger =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">20</span>)) )</code></pre></div>
-<div id="htmlwidget-66aa96637275768f2060" style="width:672px;height:480px;" class="gauge html-widget"></div>
-<script type="application/json" data-for="htmlwidget-66aa96637275768f2060">{"x":{"value":28.27,"min":0,"max":100,"customSectors":[{"lo":41,"hi":100,"color":"success"},{"lo":21,"hi":40,"color":"warning"},{"lo":0,"hi":20,"color":"danger"}],"symbol":"%","label":null,"humanFriendly":true,"humanFriendlyDecimal":1,"href":null},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-8809677063b2655f1b38" style="width:672px;height:480px;" class="gauge html-widget"></div>
+<script type="application/json" data-for="htmlwidget-8809677063b2655f1b38">{"x":{"value":28.27,"min":0,"max":100,"customSectors":[{"lo":41,"hi":100,"color":"success"},{"lo":21,"hi":40,"color":"warning"},{"lo":0,"hi":20,"color":"danger"}],"symbol":"%","label":null,"humanFriendly":true,"humanFriendlyDecimal":1,"href":null},"evals":[],"jsHooks":[]}</script>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">PROB</code></pre></div>
 <pre><code>[1] 0.2827</code></pre>
 <p> ■ 算出來的機率比較高的就是比較好的模型，對嗎？ 為甚麼？<br>  <font color="steelblue"> 不一定，模型機率高只是對原始數據準確(overfitting)，但對預測數據會不準。</font><br> <br><br></p>
-<p>【D.預測與決策】<br> 假設有一個賭局，你可以花30元選定一個連續60秒的時段，如果老忠實下一次的噴發時間落在你指定的區間，你就可以贏到100元；請你使用頻寬為<code>0.5</code>的平滑密度模型 …<br>  ■ 決定要不要參加這個賭局<br>  <font color="steelblue"> 要參加，以試驗10000000次下，每一局平均可以獲得18元 </font><br></p>
+<p>💵💶💷💸【D.預測與決策】💵💶💷💸<br> 假設有一個賭局，你可以花30元選定一個連續60秒的時段，如果老忠實下一次的噴發時間落在你指定的區間，你就可以贏到100元；請你使用頻寬為<code>0.5</code>的平滑密度模型 …<br>  ■ 決定要不要參加這個賭局<br>  <font color="steelblue"> 要參加，以試驗10000000次下，每一局平均可以獲得18元 </font><br></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#利用rbinom 計算：</span>
 bet=<span class="dv">10000000</span>
 x=<span class="kw">rbinom</span>(bet,<span class="dv">1</span>,<span class="fl">0.48</span>)<span class="co">#隨機計算：賭100次，機率為0.48</span>
@@ -324,7 +324,7 @@ b=bet<span class="op">*</span><span class="dv">30</span><span class="co">#賭的
 c=a<span class="op">*</span><span class="dv">100</span><span class="co">#賭贏的錢（贏得100元）</span>
 d=c<span class="op">-</span>b<span class="co">#賺到的錢</span>
 d<span class="op">/</span>bet<span class="co">#期望值</span></code></pre></div>
-<pre><code>[1] 17.99</code></pre>
+<pre><code>[1] 17.97</code></pre>
 <p> ■ 如果你參加的話，你要把噴發時間設定在哪一個區間呢？<br>  <font color="steelblue"> 直接調模型的數值範圍，找到在3.9-4.9有最大的機率47.66%</font><br></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#用R算機率</span>
 D=faithful<span class="op">$</span>eruptions
@@ -335,8 +335,8 @@ prob</code></pre></div>
 <pre><code>[1] 0.4766</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">gauge</span>(<span class="kw">round</span>(<span class="dv">100</span><span class="op">*</span>prob,<span class="dv">2</span>), <span class="dt">min =</span> <span class="dv">0</span>, <span class="dt">max =</span> <span class="dv">100</span>, <span class="dt">symbol =</span> <span class="st">'%'</span>, <span class="kw">gaugeSectors</span>(
       <span class="dt">success =</span> <span class="kw">c</span>(<span class="dv">41</span>, <span class="dv">100</span>), <span class="dt">warning =</span> <span class="kw">c</span>(<span class="dv">21</span>, <span class="dv">40</span>), <span class="dt">danger =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">20</span>)) )</code></pre></div>
-<div id="htmlwidget-71986c0dc0b8fc5d1544" style="width:672px;height:480px;" class="gauge html-widget"></div>
-<script type="application/json" data-for="htmlwidget-71986c0dc0b8fc5d1544">{"x":{"value":47.66,"min":0,"max":100,"customSectors":[{"lo":41,"hi":100,"color":"success"},{"lo":21,"hi":40,"color":"warning"},{"lo":0,"hi":20,"color":"danger"}],"symbol":"%","label":null,"humanFriendly":true,"humanFriendlyDecimal":1,"href":null},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-046cd43ddca60883058c" style="width:672px;height:480px;" class="gauge html-widget"></div>
+<script type="application/json" data-for="htmlwidget-046cd43ddca60883058c">{"x":{"value":47.66,"min":0,"max":100,"customSectors":[{"lo":41,"hi":100,"color":"success"},{"lo":21,"hi":40,"color":"warning"},{"lo":0,"hi":20,"color":"danger"}],"symbol":"%","label":null,"humanFriendly":true,"humanFriendlyDecimal":1,"href":null},"evals":[],"jsHooks":[]}</script>
 <p> ■ 你設在這個區間的話，參加這個賭局的期望值是？<br></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(<span class="dv">100</span><span class="op">-</span><span class="dv">30</span>)<span class="op">*</span>prob <span class="op">+</span><span class="st"> </span>(<span class="op">-</span><span class="dv">30</span>)<span class="op">*</span>(<span class="dv">1</span><span class="op">-</span>prob)</code></pre></div>
 <pre><code>[1] 17.66</code></pre>
