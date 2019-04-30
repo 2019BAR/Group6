@@ -1,0 +1,174 @@
+---
+title: "巴西購物嘉年華"
+author: "Group6-Anny"
+date: "2019/4/23"
+output: html_document
+---
+<hr>
+####賣家到買家的路徑
+```{r}
+#load packages
+pacman::p_load(ggplot2,ggmap,maptools,sp,maps,dplyr,tm,SnowballC,wordcloud,RColorBrewer,plotly,Imap,ggrepel,tidyverse,geosphere,threejs,knitr,data.table,DT) 
+```
+
+####Brazil
+```{r}
+c=data.table::fread("~/2019RPB/brazilian-ecommerce/complete2.csv")
+geolocation=data.table::fread("~/2019RPB/brazilian-ecommerce/olist_geolocation_dataset.csv")
+
+Brazil = map_data("world") %>% filter(region=="Brazil")
+# Removing some outliers
+#Brazils most Northern spot is at 5 deg 16′ 27.8″ N latitude.;
+geolocation = geolocation[geolocation$geolocation_lat <= 5.27438888,]
+#it’s most Western spot is at 73 deg, 58′ 58.19″W Long.
+geolocation = geolocation[geolocation$geolocation_lng >= -73.98283055,]
+#It’s most southern spot is at 33 deg, 45′ 04.21″ S Latitude.
+geolocation = geolocation[geolocation$geolocation_lat >= -33.75116944,]
+#It’s most Eastern spot is 34 deg, 47′ 35.33″ W Long.
+geolocation = geolocation[geolocation$geolocation_lng <=  -34.79314722,]
+#geolocation.csv的點
+b = ggplot() +
+  geom_polygon(data = Brazil, aes(x=long, y = lat, group = group), fill="gray")#巴西地圖
+b + geom_point(data = geolocation, aes(x=geolocation_lng, y=geolocation_lat, color=geolocation_state),size=0.2) 
+#ggsave("Brazil.png", plot = last_plot())
+```
+
+<hr>
+####seller
+```{r}
+#seller
+b + geom_point(data= c,aes(x=selllng,y=selllat,color=seller_state),size=0.2)
+#ggsave("sellers.png", plot = last_plot())
+```
+
+<hr>
+####customer
+```{r}
+b + geom_point(data = c,aes(x=custlng,y=custlat,color=customer_state),size=0.2)
+#ggsave("customers.png", plot = last_plot())
+```
+
+<hr>
+####賣家到買家的路徑<br>
+####Total 3萬多條
+```{r}
+t=c %>%
+  group_by(selllat,selllng,custlat,custlng) %>%
+  summarise(count=n())%>%arrange(desc(count)) #seller->cust數量
+
+ggplot() +
+  geom_polygon(data = Brazil, aes(x=long, y = lat, group = group), fill="gray") +
+  geom_point(data=t,
+             aes(x=custlng, y=custlat), #cust=blue
+             colour="blue",
+             size=0.2) +
+  geom_point(data=t,
+             aes(x=selllng, y=selllat), #sell=green
+             colour="green",
+             size=0.2) +
+  geom_segment(data=t,
+              aes(x=selllng, y=selllat, xend=custlng, yend=custlat),
+              col="red",
+              size=.1)
+```
+
+
+<hr>
+####Top 1500
+```{r}
+ggplot() +
+  geom_polygon(data = Brazil, aes(x=long, y = lat, group = group), fill="gray") +
+  geom_point(data=t[1:1500,],
+             aes(x=custlng, y=custlat), #cust=blue
+             colour="blue",
+             size=0.2) +
+  geom_point(data=t[1:1500,],
+             aes(x=selllng, y=selllat), #sell=green
+             colour="green",
+             size=0.2) +
+  geom_segment(data=t[1:1500,],
+              aes(x=selllng, y=selllat, xend=custlng, yend=custlat),
+              col="red",
+              size=.1)
+#ggsave("top1500.png", plot = last_plot())
+```
+
+<hr>
+####Top 1000
+```{r}
+ggplot() +
+  geom_polygon(data = Brazil, aes(x=long, y = lat, group = group), fill="gray") +
+  geom_point(data=t[1:1000,],
+             aes(x=custlng, y=custlat), #cust=blue
+             colour="blue",
+             size=0.2) +
+  geom_point(data=t[1:1000,],
+             aes(x=selllng, y=selllat), #sell=green
+             colour="green",
+             size=0.2) +
+  geom_segment(data=t[1:1000,],
+              aes(x=selllng, y=selllat, xend=custlng, yend=custlat),
+              col="red",
+              size=.1)
+```
+
+<hr>
+####Top 500
+```{r}
+ggplot() +
+  geom_polygon(data = Brazil, aes(x=long, y = lat, group = group), fill="gray") +
+  geom_point(data=t[1:500,],
+             aes(x=custlng, y=custlat), #cust=blue
+             colour="blue",
+             size=0.2) +
+  geom_point(data=t[1:500,],
+             aes(x=selllng, y=selllat), #sell=green
+             colour="green",
+             size=0.2) +
+  geom_segment(data=t[1:500,],
+              aes(x=selllng, y=selllat, xend=custlng, yend=custlat),
+              col="red",
+              size=.1)
+```
+<hr>
+####Top 10
+```{r}
+ggplot() +
+  geom_polygon(data = Brazil, aes(x=long, y = lat, group = group), fill="gray") +
+  geom_point(data=t[1:10,],
+             aes(x=custlng, y=custlat), #cust=blue
+             colour="blue",
+             size=3) +
+  geom_point(data=t[1:10,],
+             aes(x=selllng, y=selllat), #sell=green
+             colour="green",
+             size=3) +
+  geom_segment(data=t[1:10,],
+              aes(x=selllng, y=selllat, xend=custlng, yend=custlat),
+              col="red",
+              size=0.5)
+```
+
+<hr>
+####Top 1
+```{r}
+ggplot() +
+  geom_polygon(data = Brazil, aes(x=long, y = lat, group = group), fill="gray") +
+  geom_point(data=t[1:2,],
+             aes(x=custlng, y=custlat), #cust=blue
+             colour="blue",
+             size=3) +
+  geom_point(data=t[1:2,],
+             aes(x=selllng, y=selllat), #sell=green
+             colour="green",
+             size=3) +
+  geom_segment(data=t[1:2,],
+              aes(x=selllng, y=selllat, xend=custlng, yend=custlat),
+              col="red",
+              size=2)
+```
+
+
+
+
+
