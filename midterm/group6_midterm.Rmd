@@ -1,156 +1,176 @@
 ---
 title: "巴西購物嘉年華"
-author: "Group6-楊禾馨"
-date: "2019/4/12"
+author: "Group6-Anny"
+date: "2019/4/23"
 output: html_document
 ---
+組員： `B035040052 林榮鏵` `B045020041諶彥汝` `B056090039 楊禾馨` `M064020056 閻俞蓉` `M064111003 洪筱涵` `M074111035 劉志峰`
 
 <hr>
+####賣家到買家的路徑
 ```{r}
-#pkgs=c("dplyr",ggplot2","lubridate","stringr")
-pacman::p_load(dplyr,ggplot2,lubridate,stringr)
+#load packages
+pacman::p_load(ggplot2,ggmap,maptools,sp,maps,dplyr,tm,SnowballC,wordcloud,RColorBrewer,plotly,Imap,ggrepel,tidyverse,geosphere,threejs,knitr,data.table,DT) 
 ```
 
+####Brazil
 ```{r}
-customers=read.csv("~/Desktop/R/olist_customers_dataset.csv")
-location=read.csv("~/Desktop/R/olist_geolocation_dataset.csv")
-item=read.csv("~/Desktop/R/olist_order_items_dataset.csv")
-payments=read.csv("~/Desktop/R/olist_order_payments_dataset.csv")
-reviews=read.csv("~/Desktop/R/olist_order_reviews_dataset.csv")
-orders=read.csv("~/Desktop/R/olist_orders_dataset.csv")
-products=read.csv("~/Desktop/R/olist_products_dataset.csv")
-sellers=read.csv("~/Desktop/R/olist_sellers_dataset.csv")
-pname=read.csv("~/Desktop/R/product_category_name_translation.csv")
-```
-<hr>
-###合併產品名欄位
-```{r}
-products=merge(products,pname, by="product_category_name") 
-products=products[-c(1)]
-```
-<hr>
-###整理日期資料
-```{r}
-purchase_month<-substr(orders$order_purchase_timestamp,6,7)
-ym<-substring(orders$order_purchase_timestamp,1,7)
-orders=cbind(orders,purchase_month,ym) 
-```
+c=data.table::fread("~/2019RPB/brazilian-ecommerce/complete2.csv")
+geolocation=data.table::fread("~/2019RPB/brazilian-ecommerce/olist_geolocation_dataset.csv")
 
-<hr>
-```{r} 
-ggplot(orders,aes(factor(ym)))+
-  geom_bar(fill='lavenderblush3',width =1,color='seashell4')+ 
-  coord_flip()+ 
-  labs(x='',y='')+ 
-  theme_bw() +
-  theme(panel.grid =element_blank())
+Brazil = map_data("world") %>% filter(region=="Brazil")
+# Removing some outliers
+#Brazils most Northern spot is at 5 deg 16′ 27.8″ N latitude.;
+geolocation = geolocation[geolocation$geolocation_lat <= 5.27438888,]
+#it’s most Western spot is at 73 deg, 58′ 58.19″W Long.
+geolocation = geolocation[geolocation$geolocation_lng >= -73.98283055,]
+#It’s most southern spot is at 33 deg, 45′ 04.21″ S Latitude.
+geolocation = geolocation[geolocation$geolocation_lat >= -33.75116944,]
+#It’s most Eastern spot is 34 deg, 47′ 35.33″ W Long.
+geolocation = geolocation[geolocation$geolocation_lng <=  -34.79314722,]
+#geolocation.csv的點
+b = ggplot() +
+  geom_polygon(data = Brazil, aes(x=long, y = lat, group = group), fill="gray")#巴西地圖
+b + geom_point(data = geolocation, aes(x=geolocation_lng, y=geolocation_lat, color=geolocation_state),size=0.2) 
+#ggsave("Brazil.png", plot = last_plot())
 ```
 
 <hr>
+####seller
 ```{r}
-c=table(orders$ym)
-plot(c,type="l",ylab="")
+#seller
+b + geom_point(data= c,aes(x=selllng,y=selllat,color=seller_state),size=0.2)
+#ggsave("sellers.png", plot = last_plot())
+```
+
+<hr>
+####customer
+```{r}
+b + geom_point(data = c,aes(x=custlng,y=custlat,color=customer_state),size=0.2)
+#ggsave("customers.png", plot = last_plot())
+```
+
+<hr>
+####賣家到買家的路徑<br>
+####Total 3萬多條
+```{r}
+t=c %>%
+  group_by(selllat,selllng,custlat,custlng) %>%
+  summarise(count=n())%>%arrange(desc(count)) #seller->cust數量
+
+ggplot() +
+  geom_polygon(data = Brazil, aes(x=long, y = lat, group = group), fill="gray") +
+  geom_point(data=t,
+             aes(x=custlng, y=custlat), #cust=blue
+             colour="blue",
+             size=0.2) +
+  geom_point(data=t,
+             aes(x=selllng, y=selllat), #sell=green
+             colour="green",
+             size=0.2) +
+  geom_segment(data=t,
+              aes(x=selllng, y=selllat, xend=custlng, yend=custlat),
+              col="red",
+              size=.1)
 ```
 
 
 <hr>
-###Merge"item"to"item_plus"
-```{r} 
-item_plus=merge(item,orders, by="order_id") 
-item_plus=merge(item_plus,products,by="product_id") 
-item_plus=item_plus[c(1,2,4,8,15,16,24)] 
-names(item_plus)[7]<-paste("product_name") 
+####Top 1500
+```{r}
+ggplot() +
+  geom_polygon(data = Brazil, aes(x=long, y = lat, group = group), fill="gray") +
+  geom_point(data=t[1:1500,],
+             aes(x=custlng, y=custlat), #cust=blue
+             colour="blue",
+             size=0.2) +
+  geom_point(data=t[1:1500,],
+             aes(x=selllng, y=selllat), #sell=green
+             colour="green",
+             size=0.2) +
+  geom_segment(data=t[1:1500,],
+              aes(x=selllng, y=selllat, xend=custlng, yend=custlat),
+              col="red",
+              size=.1)
+#ggsave("top1500.png", plot = last_plot())
 ```
 
 <hr>
-###Heatmap:Month&Product
+####Top 1000
 ```{r}
-month_detail<-ggplot(item_plus,aes(x=purchase_month,y=product_name))
-month_detail+stat_bin2d()+
-scale_fill_gradient(low="lightblue",high="red",limits=c(0,1500))+
-#設置顏色過渡爲從淺藍到紅色，對應區間爲0-1500，table得出最高單項銷量不超過1200
-labs(x='Month',y='Product')+
-theme_bw()+
-theme(axis.text.y= element_text(size =6, vjust = 0.5, hjust =1))+
-theme(panel.grid =element_blank())
+ggplot() +
+  geom_polygon(data = Brazil, aes(x=long, y = lat, group = group), fill="gray") +
+  geom_point(data=t[1:1000,],
+             aes(x=custlng, y=custlat), #cust=blue
+             colour="blue",
+             size=0.2) +
+  geom_point(data=t[1:1000,],
+             aes(x=selllng, y=selllat), #sell=green
+             colour="green",
+             size=0.2) +
+  geom_segment(data=t[1:1000,],
+              aes(x=selllng, y=selllat, xend=custlng, yend=custlat),
+              col="red",
+              size=.1)
 ```
-
 
 <hr>
+####Top 500
 ```{r}
-tail(sort(summary(sellers$seller_state))) #買家數量最多的前六個州
+ggplot() +
+  geom_polygon(data = Brazil, aes(x=long, y = lat, group = group), fill="gray") +
+  geom_point(data=t[1:500,],
+             aes(x=custlng, y=custlat), #cust=blue
+             colour="blue",
+             size=0.2) +
+  geom_point(data=t[1:500,],
+             aes(x=selllng, y=selllat), #sell=green
+             colour="green",
+             size=0.2) +
+  geom_segment(data=t[1:500,],
+              aes(x=selllng, y=selllat, xend=custlng, yend=custlat),
+              col="red",
+              size=.1)
 ```
-
-```{r}
-tail(sort(summary(customers$customer_state))) #顧客數量最多的前六個州
-```
-
-###Merge item_plus
 <hr>
+####Top 10
 ```{r}
-item_plus<-merge(item_plus,sellers, by="seller_id")
-item_plus<-merge(item_plus,customers,by="customer_id")
-item_plus=item_plus[c(1:7,10,14)]
+ggplot() +
+  geom_polygon(data = Brazil, aes(x=long, y = lat, group = group), fill="gray") +
+  geom_point(data=t[1:10,],
+             aes(x=custlng, y=custlat), #cust=blue
+             colour="blue",
+             size=3) +
+  geom_point(data=t[1:10,],
+             aes(x=selllng, y=selllat), #sell=green
+             colour="green",
+             size=3) +
+  geom_segment(data=t[1:10,],
+              aes(x=selllng, y=selllat, xend=custlng, yend=custlat),
+              col="red",
+              size=0.5)
 ```
-
-###Seller_state
-<hr>
-```{r}
-ggplot(item_plus,aes(factor(seller_state)))+
-  geom_bar(fill='olivedrab4',width =0.9)+
-  coord_flip()+
-  labs(x='Sellers',y='')+ 
-  theme_bw()+
-  theme(panel.grid =element_blank())
-```
-
-###Custaomer_state
-<hr>
-```{r}
-ggplot(item_plus,aes(factor(customer_state)))+
-  geom_bar(fill='olivedrab4',width =0.9)+ 
-  coord_flip()+ 
-  labs(x='Customer',y='')+ 
-  theme_bw()+ 
-  theme(panel.grid =element_blank())
-```
-
-###Product & Seller_state
-<hr>
-```{r}
-ggplot()+
-  geom_bar(data=item_plus,aes(product_name,fill=seller_state),width=0.9,alpha=0.9)+ 
-  coord_flip()+
-  labs(x='Product',y='')+ 
-  theme(axis.text.y= element_text(size =5, vjust = 0.5))+
-  theme_bw()+ 
-  theme(panel.grid =element_blank())
-```
-
-###Product & Custaomer_state
-<hr>
-```{r}
-ggplot()+
-  geom_bar(data=item_plus,aes(product_name,fill=customer_state),width=0.9,alpha=0.9)+ 
-  coord_flip()+
-  labs(x='Product',y='')+ 
-  theme(axis.text.y= element_text(size =5, vjust = 0.5))+
-  theme_bw()+ 
-  theme(panel.grid =element_blank())
-```
-
-
 
 <hr>
-###Heatmap:Seller_states & Product
+####Top 1
 ```{r}
-product_state<-ggplot(item_plus,aes(x=seller_state,y=product_name))
-product_state+stat_bin2d()+
-scale_fill_gradient(low="lightblue",high="red",limits=c(0,10000))+
-#設置顏色過渡爲從淺藍到紅色，對應區間爲0-1500，table得出最高單項銷量不超過10000
-theme(text=element_text(family="Heiti TC Light"))+ 
-  labs(x='Seller-State',y='Product')+
-theme(axis.text.y= element_text(size =6, vjust = 0.5, hjust =1))+
-  theme_bw()+ 
-theme(panel.grid =element_blank()) 
+ggplot() +
+  geom_polygon(data = Brazil, aes(x=long, y = lat, group = group), fill="gray") +
+  geom_point(data=t[1:2,],
+             aes(x=custlng, y=custlat), #cust=blue
+             colour="blue",
+             size=3) +
+  geom_point(data=t[1:2,],
+             aes(x=selllng, y=selllat), #sell=green
+             colour="green",
+             size=3) +
+  geom_segment(data=t[1:2,],
+              aes(x=selllng, y=selllat, xend=custlng, yend=custlat),
+              col="red",
+              size=2)
 ```
+
+
+
+
+
