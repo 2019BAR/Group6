@@ -1,0 +1,135 @@
+---
+title: "檢定力分析"
+output: 
+  flexdashboard::flex_dashboard:
+    theme: default
+    orientation: rows
+    css: JH.css
+    social: menu
+    source_code: embed 
+    logo: nsysu48.png
+    favicon: nsysu48.png
+runtime: shiny
+---
+
+```{r}
+pacman::p_load(shinyWidgets, flexdashboard, pwr)
+```
+
+Input {.sidebar}
+-------------------------------------
+```{r}
+ 
+chooseSliderSkin("Modern")
+ 
+hr()
+prettyRadioButtons("dv", "選擇應變數", choices=list(
+  "n","d", "a", "p"), selected="n", status="success", 
+  inline=T, icon=icon("check"), animation="jelly")
+
+hr()
+sliderInput("n", "樣本大小(n)", 10, 500, 199, 1)
+sliderInput("a", "顯著水準(a)", 0.005, 0.10, 0.05, 0.001)
+sliderInput("d", "效果係數(d)", 0.1, 0.5, 0.2, 0.01)
+sliderInput("p", "檢定力(p)", 0.50, 0.99, 0.80, 0.01)
+
+hr()
+switchInput("PA", label="對立抽樣分佈", value=TRUE, size = "mini")
+
+X1 = reactive({
+  if(input$dv == "n") {
+    n = ceiling(pwr.t.test(
+      d=input$d, sig=input$a, power=input$p, type="one.sample")$n)
+    updateSliderInput(session, "n", value=n)
+  }
+  if(input$dv == "d") {
+    d = round(pwr.t.test(
+      n=input$n, sig=input$a, power=input$p, type="one.sample")$d, 2)
+    updateSliderInput(session, "d", value=d)
+  }
+  if(input$dv == "a") {
+    a = round(pwr.t.test(sig.level=NULL,
+      n=input$n, d=input$d, power=input$p, type="one.sample")$sig.level, 3)
+    updateSliderInput(session, "a", value=a)
+  }
+  if(input$dv == "p") {
+    p = round(pwr.t.test(
+      n=input$n, sig=input$a, d=input$d, type="one.sample")$power, 2)
+    updateSliderInput(session, "p", value=p)
+  }
+  list(n=input$n, d=input$d, p=input$p, a=input$a)
+})
+
+
+```
+
+
+Row 1 {data-height=90%}
+-------------------------------------
+### 虛無假設與對立假設之下的抽樣分佈 (族群標準差 = 30)
+```{r}
+shade = function(x1, x2, f, color='#FF00FF40', ...) {
+  x = seq(x1, x2, len=100)
+  polygon(c(x1,x,x2), c(0, f(x, ...), 0), col=color, border=NA)}
+
+renderPlot({
+  x = X1(); n=x$n; d=x$d; a=x$a; p=x$p
+  sigma=30; sdev=sigma/sqrt(n); q = qt(c(a/2, 1-a/2), n-1)
+
+  par(mar=c(4,4,2,1))
+  curve(dt(x/sdev, n-1)/sdev,-10,20,1000, ylim=c(-0.01,0.27), xlab=bquote(
+    italic(bar(X)) ~ ", 樣本平均值"), ylab="density", main=bquote(
+    "樣本大小:" ~ italic(n) == .(n) ~
+    ",  效果量:" ~ italic(d %.% sigma) == .(d*sigma) ~ 
+    ",  抽樣標準差:" ~ italic(sigma[bar(x)]) == .(round(sdev,2)) ~
+    ",  檢定臨界值:" ~ italic(t[c]) == .(round(q[2]*sdev,2))
+    ), lwd=2,family="STHeitiTC-Light")
+  y1 = 0.005 + dt(0, n-1)/sdev; x1 = d*sigma
+  lines(x=c(0,0), y=c(0,y1), lty=3, col='gray')
+  text(0, y1, bquote(H[0] ~ ":" ~ mu == 0), pos=3, cex=1.5)
+  text(sdev, 0, bquote(italic(sigma[bar(x)])),pos=1, cex=1.25)
+  shade(-10, sdev*q[1], function(x) dt(x/sdev, n-1)/sdev )
+  shade(sdev*q[2], 20, function(x) dt(x/sdev, n-1)/sdev )
+  abline(h=0, col='gray')
+  points(c(0,sdev),c(0,0),pch='I',col='gray')
+
+  if(input$PA) {
+    shade(-10, sdev*q[2], function(x)
+    dt(x/sdev - d*sqrt(n), n-1)/sdev, "#FFBF0060")
+    points(sdev*q[2],0,pch='I',col='gray')
+    lines(x=c(x1,x1), y=c(0,y1), lty=3, col='blue')
+    text(x1, y1, bquote(H[1] ~  ":" ~ mu == .(sigma*d)), 
+         pos=3, col='blue', cex=1.5)
+    text(sdev*q[2], 0, bquote(italic(t[c])),pos=1,cex=1.25)
+    curve(dt(x/sdev - d*sqrt(n), n-1)/sdev, n=1000, add=T, col='blue', lwd=2)
+  }
+  })
+
+
+```
+
+Row 2 {.tabset .tabset-fade data-height=10%}
+-------------------------------------
+### 1.假設檢定
+複習假設檢定的名詞和概念
+
+### 2.檢定力分析
+介紹檢定力分析的原理
+
+### 3.策略模擬一
+兩相依變數 策略優化：
+給定效果量、抽樣成本、顯著水準、報酬向量
+
+### 4.策略模擬二
+兩相依變數含選項 策略優化：給定效果量、抽樣成本、報酬向量/顯著水準
+
+### 5.策略模擬三
+三相依變數 策略優化：給定效果量、抽樣成本、報酬矩陣
+
+### 6.策略模擬四
+抽樣成本(報酬矩陣)敏感性分析
+
+
+
+
+
