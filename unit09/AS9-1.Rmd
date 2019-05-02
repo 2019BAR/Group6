@@ -128,7 +128,6 @@ legend('topright',legend=colnames(A),fill=rainbow(7))
 &emsp;&emsp;3.勤蜜蜂（潛力客群）<br>
 &emsp;&emsp;4.蛇冬眠（沉睡客群）<br>
 &emsp;&emsp;5.渡渡鳥（匿跡客群）</font><br>
-
 &emsp; ■ 請你們為這五個族群各設計一個行銷策略<br>
 &emsp;&emsp;<font color=#5D8DE2>**1.老鼠屎（虧損客群）**<br>
 &emsp;&emsp;嘗試藉由問卷等方式了解其行為特質，再根據下列不同屬性，採取不同對應方式以轉換其歸類。<br>
@@ -141,11 +140,9 @@ legend('topright',legend=colnames(A),fill=rainbow(7))
 &emsp;&emsp;寄送寄送熱門景點航線，機票、旅館套裝折扣的視覺廣告，藉由視覺刺激激發度假想像。<br>
 &emsp;&emsp;**5.渡渡鳥（匿跡客群）**<br>
 &emsp;&emsp;現階段只主打上述客群，匿跡客群可遇不可求，只能訴以電視、看板等普遍性廣告。</font><br>
-
 &emsp; ■ 統計上最好的分群也是實務上最好的分群嗎？<br>
 &emsp;&emsp;<font color=#5D8DE2>不一定。消費者今天所做出的消費行為到明天不一定還會相同，而當企業無法讓顧客有客製化的感覺時，便容易選擇其他企業。<br>
 &emsp;&emsp;而能夠即時地了解每個顧客的偏好、消費脈絡和顧客旅程，才能做出實務上最好的安排。</font><br>
-
 &emsp; ■ 除了考慮群間和群間距離之外，實務上的分群通常還需要考慮那些因數？<br>
 &emsp;&emsp;<font color=#5D8DE2>因為現實情況是持續、複雜的、受多種因素相互影響的，所以在實務上我們應把分群作為一種手段而不是完全依賴它，<br>&emsp;&emsp;要考慮的因素如下：<br>
 &emsp;&emsp;（1）用戶類型（用戶分群）<br>
@@ -159,6 +156,5 @@ legend('topright',legend=colnames(A),fill=rainbow(7))
 &emsp;&emsp;（9）政治、社會、經濟環境影響<br>
 &emsp;&emsp;（10）其他未被分析到的群體的影響等</font><br>
 </p class="qiz">
-
 <br><br><br><hr>
 
