@@ -67,7 +67,6 @@ c(logit=logit, odd=odd, prob=prob)
 What if `x1=2, x2=3`?
 
 ```{r}
-#
 logit = sum(b * c(1, 2, 3))
 odd = exp(logit)
 prob = odd/(1+odd)
@@ -104,12 +103,14 @@ for(f in logit) {
   abline((f-b[1])/b[3], -b[2]/b[3], col=ifelse(f==0,'blue','cyan')) }
 ```
 
+<p class="qiz">
 <span style="font-size:24px"> `r "\U1F3AF"` : </span>
 What do the blue/cyan lines means?<br>
-&emsp; &emsp;<font color=VioletRed>answer</font><br>
+&emsp; &emsp;<font color=VioletRed>0.1~0.9的等機率線</font><br>
 <span style="font-size:24px"> `r "\U1F3AF"` : </span>
 Given any point in the figure above, how can you tell its (predicted) probability approximately?<br>
-&emsp; &emsp;<font color=VioletRed>answer</font><br>
+&emsp; &emsp;<font color=VioletRed>看觀察點最接近的等機率線為何</font><br>
+</p class="qiz">
 <br><hr>
 
 ### 【B】 邏輯式回歸
@@ -152,10 +153,14 @@ abline(v=0,h=0.5,col='pink')
 points(0,0.5,pch=20,cex=1.5,col='red')
 ```
 
+<p class="qiz">
 <span style="font-size:24px"> `r "\U1F3AF"` : </span>
 What are the definition of `logit` & `logistic function`? What is the relationship between them?<br>
-&emsp; &emsp;<font color=VioletRed>answer</font><br>
-
+&emsp; &emsp;<font color=VioletRed>The logit is a transformation. Logistic regression is a regression model.<br>
+&emsp; &emsp;The logit transformation transforms a line to a logistic curve. <br>
+&emsp; &emsp;Logistic regression fits a logistic curve to set of data where the dependent variable can only take the values 0 and 1. <br>
+&emsp; &emsp;It can be generalised to fitting ordinal data.</font><br>
+</p class="qiz">
 <br><br><br><hr>
 
 
