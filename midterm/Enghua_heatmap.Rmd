@@ -1,0 +1,296 @@
+---
+title: "巴西購物嘉年華"
+author: "Group6-Enghua"
+date: "2019/4/25"
+output: html_document
+---
+<hr>
+####賣家到買家的路徑
+```{r}
+#load packages
+pacman::p_load(ggplot2,ggmap,maptools,sp,maps,dplyr,tm,SnowballC,wordcloud,RColorBrewer,plotly,Imap,ggrepel,tidyverse,geosphere,threejs,knitr,data.table,DT,lubridate,dplyr,d3heatmap) 
+```
+
+
+=====================================+助教的Code+==========================================
+```{r}
+c=data.table::fread("~/2019RPB/brazilian-ecommerce/complete2.csv")
+```
+
+
+```{r}
+#『購買』2017-08-31至2018-08-31，這一年期間的買家購買資料框
+order_purchase_2017_2018 = 
+  c3%>% mutate(date = as.Date(c3$order_purchase_timestamp, format="%m-%d-%Y")) %>%
+  filter(date >= as.Date("2017-08-31") & date < as.Date("2018-8-31"))
+```
+
+```{r}
+#時間格式
+dspurchase=as.POSIXct(order_purchase_2017_2018$order_purchase_timestamp,format="%m-%d-%y")
+```
+
+```{r}
+#2017-08-31至2018-08-31，各月份商品銷售的狀態
+table(order_purchase_2017_2018$product_category_name_english,format(dspurchase,"%m")) %>% 
+  as.data.frame.matrix %>% 
+  d3heatmap(T,F,col=colorRamp(c('DarkGreen','Orange','Red')))
+```
+
+```{r}
+#table套件整理出買家在平日消費時間的頻率分佈
+table(weekday=format(dspurchase,"%u"),hour=format(dspurchase,"%H"))
+```
+
+```{r}
+#透過熱圖發現買家在平日的消費時間
+table(format(dspurchase,"%u"),format(dspurchase,"%H")) %>% 
+  as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('DarkGreen','Orange','Red')))
+```
+
+```{r}
+#透過熱圖發現買家在各月的消費時間
+table(format(dspurchase,"%m"),format(dspurchase,"%H")) %>% 
+  as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('DarkGreen','Orange','Red')))
+```
+
+
+```{r}
+#2017-08-31至2018-08-31，購買頻率（高）前10名的商品
+table(order_purchase_2017_2018$product_category_name_english)%>%sort%>%tail(10)
+```
+
+```{r}
+#2017-08-31至2018-08-31，前10名購買商品的頻率趨線
+bed_bath_table=filter(order_purchase_2017_2018,product_category_name_english=="bed_bath_table")
+health_beauty=filter(order_purchase_2017_2018,product_category_name_english=="health_beauty")
+sports_leisure=filter(order_purchase_2017_2018,product_category_name_english=="sports_leisure")
+furniture_decor=filter(order_purchase_2017_2018,product_category_name_english=="furniture_decor")
+computers_accessories=filter(order_purchase_2017_2018,product_category_name_english=="computers_accessories")
+housewares=filter(order_purchase_2017_2018,product_category_name_english=="housewares")
+watches_gifts=filter(order_purchase_2017_2018,product_category_name_english=="watches_gifts")
+telephony=filter(order_purchase_2017_2018,product_category_name_english=="telephony")
+auto=filter(order_purchase_2017_2018,product_category_name_english=="auto")
+garden_tools=filter(order_purchase_2017_2018,product_category_name_english=="garden_tools")
+
+top1purchase=as.POSIXct(bed_bath_table$order_purchase_timestamp,format="%m-%d-%y")
+top2purchase=as.POSIXct(health_beauty$order_purchase_timestamp,format="%m-%d-%y")
+top3purchase=as.POSIXct(sports_leisure$order_purchase_timestamp,format="%m-%d-%y")
+top4purchase=as.POSIXct(furniture_decor$order_purchase_timestamp,format="%m-%d-%y")
+top5purchase=as.POSIXct(computers_accessories$order_purchase_timestamp,format="%m-%d-%y")
+top6purchase=as.POSIXct(housewares$order_purchase_timestamp,format="%m-%d-%y")
+top7purchase=as.POSIXct(watches_gifts$order_purchase_timestamp,format="%m-%d-%y")
+top8purchase=as.POSIXct(telephony$order_purchase_timestamp,format="%m-%d-%y")
+top9purchase=as.POSIXct(auto$order_purchase_timestamp,format="%m-%d-%y")
+top10purchase=as.POSIXct(garden_tools$order_purchase_timestamp,format="%m-%d-%y")
+
+top1=table(format(top1purchase,"%m"))
+top2=table(format(top2purchase,"%m"))
+top3=table(format(top3purchase,"%m"))
+top4=table(format(top4purchase,"%m"))
+top5=table(format(top5purchase,"%m"))
+top6=table(format(top6purchase,"%m"))
+top7=table(format(top7purchase,"%m"))
+top8=table(format(top8purchase,"%m"))
+top9=table(format(top9purchase,"%m"))
+top10=table(format(top10purchase,"%m"))
+
+plot(top1,type="b",col="red",lty=3,lwd=2,main="2017/9~2018/9_order_purchase_frequency",xlab="month",ylab="frequency",ylim = c(1,1300))
+lines(top2,type="b",col="blue",lty=3,lwd=2)
+lines(top3,type="b",col="yellow",lty=3,lwd=2)
+lines(top4,type="b",col="green",lty=3,lwd=2)
+lines(top5,type="b",col="purple",lty=3,lwd=2)
+lines(top6,type="b",col="black",lty=3,lwd=2)
+lines(top7,type="b",col="magenta",lty=3,lwd=2)
+lines(top8,type="b",col="green3",lty=3,lwd=2)
+lines(top9,type="b",col="gray",lty=3,lwd=2)
+lines(top10,type="b",col="cyan",lty=3,lwd=2)
+#legend("topleft", legend=c("bed_bath_table","health_beauty","sports_leisure","furniture_decor","computers_accessories","housewares","watches_gifts","telephony","auto","garden_tools"),
+ #     col=c("red","blue","yellow","green","purple","black","magenta","green3","gray","cyan"),lty=3,lwd=15, cex=0.8)
+```
+
+```{r}
+#『物流』2017-08-31至2018-08-31，物流狀況
+delivered_carrier_2017_2018= 
+  c3%>% mutate(date = as.Date(c3$order_delivered_carrier_date, format="%m-%d-%Y")) %>%
+  filter(date >= as.Date("2017-08-31") & date < as.Date("2018-8-31"))
+```
+
+```{r}
+#時間格式
+dscarrier=as.POSIXct(delivered_carrier_2017_2018$order_delivered_carrier_date,format="%m-%d-%y")
+```
+
+```{r}
+#2017年平日的物流頻率
+table(format(dscarrier,"%w"),format(dscarrier,"%H"))%>% 
+  as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('DarkGreen','Orange','Red')))
+```
+
+```{r}
+#2017-08-31至2018-08-31，各月份物流的流動狀況，查出哪一個月較適合物流
+table(delivered_carrier_2017_2018$product_category_name_english,format(dscarrier,"%m")) %>% 
+  as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('DarkGreen','Orange','Red')))
+```
+
+```{r}
+#2017-08-31至2018-08-31，平日物流的流動狀況
+table(format(dscarrier,"%w"),format(dscarrier,"%H"))%>% 
+  as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('DarkGreen','Orange','Red')))
+```
+
+
+
+```{r}
+#『物流』2017-03-01 至 2017-05-31 之間的物流狀況
+delivered_carrier_2017_2018_MM= 
+  c3%>% mutate(date = as.Date(c3$order_delivered_carrier_date, format="%m-%d-%Y")) %>%
+  filter(date >= as.Date("2017-03-01") & date < as.Date("2017-5-31"))
+```
+
+```{r}
+#時間格式
+dscarrierMM=as.POSIXct(delivered_carrier_2017_2018_MM$order_delivered_carrier_date,format="%m-%d-%y")
+```
+
+```{r}
+#table排列出2017年3月至5月的物流狀況
+table(format(dscarrierMM,"%d"),format(dscarrierMM,"%m"))
+table(delivered_carrier_2017_2018_MM$product_category_name_english)%>%sort%>%tail(10)
+```
+
+```{r}
+#2017-03-01 至 2017-05-31 之間平日物流時間熱圖分佈
+table(format(dscarrierMM,"%u"),format(dscarrierMM,"%H")) %>% 
+  as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('DarkGreen','Orange','Red')))
+```
+
+```{r}
+#2017-03-01 至 2017-05-31 之間各月的物流熱圖狀況
+table(format(dscarrierMM,"%m"),format(dscarrierMM,"%d"))%>% 
+  as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('DarkGreen','Orange','Red')))
+```
+
+```{r}
+#2017年，訂單排名前10名
+table(delivered_carrier_2017_2018$product_category_name_english)%>%sort%>%tail(10)
+```
+
+```{r}
+#2017-08-31至2018-08-31，前10名物流商品的頻率趨線
+bed_bath_table=filter(delivered_carrier_2017_2018,product_category_name_english=="bed_bath_table")
+health_beauty=filter(delivered_carrier_2017_2018,product_category_name_english=="health_beauty")
+sports_leisure=filter(delivered_carrier_2017_2018,product_category_name_english=="sports_leisure")
+furniture_decor=filter(delivered_carrier_2017_2018,product_category_name_english=="furniture_decor")
+computers_accessories=filter(delivered_carrier_2017_2018,product_category_name_english=="computers_accessories")
+housewares=filter(delivered_carrier_2017_2018,product_category_name_english=="housewares")
+watches_gifts=filter(delivered_carrier_2017_2018,product_category_name_english=="watches_gifts")
+telephony=filter(delivered_carrier_2017_2018,product_category_name_english=="telephony")
+auto=filter(delivered_carrier_2017_2018,product_category_name_english=="auto")
+garden_tools=filter(delivered_carrier_2017_2018,product_category_name_english=="garden_tools")
+
+top1carrier=as.POSIXct(bed_bath_table$order_delivered_carrier_date,format="%m-%d-%y")
+top2carrier=as.POSIXct(health_beauty$order_delivered_carrier_date,format="%m-%d-%y")
+top3carrier=as.POSIXct(sports_leisure$order_delivered_carrier_date,format="%m-%d-%y")
+top4carrier=as.POSIXct(furniture_decor$order_delivered_carrier_date,format="%m-%d-%y")
+top5carrier=as.POSIXct(computers_accessories$order_delivered_carrier_date,format="%m-%d-%y")
+top6carrier=as.POSIXct(housewares$order_delivered_carrier_date,format="%m-%d-%y")
+top7carrier=as.POSIXct(watches_gifts$order_delivered_carrier_date,format="%m-%d-%y")
+top8carrier=as.POSIXct(telephony$order_delivered_carrier_date,format="%m-%d-%y")
+top9carrier=as.POSIXct(auto$order_delivered_carrier_date,format="%m-%d-%y")
+top10carrier=as.POSIXct(garden_tools$order_delivered_carrier_date,format="%m-%d-%y")
+
+top1=table(format(top1carrier,"%m"))
+top2=table(format(top2carrier,"%m"))
+top3=table(format(top3carrier,"%m"))
+top4=table(format(top4carrier,"%m"))
+top5=table(format(top5carrier,"%m"))
+top6=table(format(top6carrier,"%m"))
+top7=table(format(top7carrier,"%m"))
+top8=table(format(top8carrier,"%m"))
+top9=table(format(top9carrier,"%m"))
+top10=table(format(top10carrier,"%m"))
+
+plot(top1,type="b",col="red",lty=3,lwd=2,main="2017/9~2018/9_Delivered_carrier_frequency",xlab="month",ylab="frequency",ylim = c(1,1300))
+lines(top2,type="b",col="blue",lty=3,lwd=2)
+lines(top3,type="b",col="yellow",lty=3,lwd=2)
+lines(top4,type="b",col="green",lty=3,lwd=2)
+lines(top5,type="b",col="purple",lty=3,lwd=2)
+lines(top6,type="b",col="black",lty=3,lwd=2)
+lines(top7,type="b",col="magenta",lty=3,lwd=2)
+lines(top8,type="b",col="green3",lty=3,lwd=2)
+lines(top9,type="b",col="gray",lty=3,lwd=2)
+lines(top10,type="b",col="cyan",lty=3,lwd=2)
+#legend("topleft", legend=c("bed_bath_table","health_beauty","sports_leisure","furniture_decor","computers_accessories","housewares","watches_gifts","telephony","auto","garden_tools"),
+#       col=c("red","blue","yellow","green","purple","black","magenta","green3","cyan","gray"),lty=3,lwd=15, cex=0.8)
+```
+
+                 toys          garden_tools            cool_stuff             telephony computers_accessories 
+                  409                   449                   504                   533                   607 
+           housewares         health_beauty        sports_leisure       furniture_decor        bed_bath_table 
+                  691                   692                   738                   878                  1029 
+
+
+```{r}
+#2017-03-01至2018-05-31，前10名物流商品的頻率趨線
+bed_bath_table=filter(delivered_carrier_2017_2018_MM,product_category_name_english=="bed_bath_table")
+furniture_decor=filter(delivered_carrier_2017_2018_MM,product_category_name_english=="furniture_decor")
+sports_leisure=filter(delivered_carrier_2017_2018_MM,product_category_name_english=="sports_leisure")
+health_beauty=filter(delivered_carrier_2017_2018_MM,product_category_name_english=="health_beauty")
+housewares=filter(delivered_carrier_2017_2018_MM,product_category_name_english=="housewares")
+computers_accessories=filter(delivered_carrier_2017_2018_MM,product_category_name_english=="computers_accessories")
+telephony=filter(delivered_carrier_2017_2018_MM,product_category_name_english=="telephony")
+ cool_stuff=filter(delivered_carrier_2017_2018_MM,product_category_name_english==" cool_stuff")
+garden_tools=filter(delivered_carrier_2017_2018_MM,product_category_name_english=="garden_tools")
+toys=filter(delivered_carrier_2017_2018_MM,product_category_name_english=="toys")
+
+top1carrier=as.POSIXct(bed_bath_table$order_delivered_carrier_date,format="%m-%d-%y")
+top2carrier=as.POSIXct(furniture_decor$order_delivered_carrier_date,format="%m-%d-%y")
+top3carrier=as.POSIXct(sports_leisure$order_delivered_carrier_date,format="%m-%d-%y")
+top4carrier=as.POSIXct(health_beauty$order_delivered_carrier_date,format="%m-%d-%y")
+top5carrier=as.POSIXct(housewares$order_delivered_carrier_date,format="%m-%d-%y")
+top6carrier=as.POSIXct(computers_accessories$order_delivered_carrier_date,format="%m-%d-%y")
+top7carrier=as.POSIXct(telephony$order_delivered_carrier_date,format="%m-%d-%y")
+top8carrier=as.POSIXct( cool_stuff$order_delivered_carrier_date,format="%m-%d-%y")
+top9carrier=as.POSIXct(garden_tools$order_delivered_carrier_date,format="%m-%d-%y")
+top10carrier=as.POSIXct(toys$order_delivered_carrier_date,format="%m-%d-%y")
+
+top1=table(format(top1carrier,"%m"))
+top2=table(format(top2carrier,"%m"))
+top3=table(format(top3carrier,"%m"))
+top4=table(format(top4carrier,"%m"))
+top5=table(format(top5carrier,"%m"))
+top6=table(format(top6carrier,"%m"))
+top7=table(format(top7carrier,"%m"))
+top8=table(format(top8carrier,"%m"))
+top9=table(format(top9carrier,"%m"))
+top10=table(format(top10carrier,"%m"))
+
+plot(top1,type="b",col="red",lty=3,lwd=2,main="2017/3~2017/5_Delivered_carrier_frequency",xlab="month",ylab="frequency",ylim = c(1,450))
+lines(top2,type="b",col="blue",lty=3,lwd=2)
+lines(top3,type="b",col="yellow",lty=3,lwd=2)
+lines(top4,type="b",col="green",lty=3,lwd=2)
+lines(top5,type="b",col="purple",lty=3,lwd=2)
+lines(top6,type="b",col="black",lty=3,lwd=2)
+lines(top7,type="b",col="magenta",lty=3,lwd=2)
+lines(top8,type="b",col="green3",lty=3,lwd=2)
+lines(top9,type="b",col="gray",lty=3,lwd=2)
+lines(top10,type="b",col="cyan",lty=3,lwd=2)
+#legend("topleft", legend=c("bed_bath_table","health_beauty","sports_leisure","furniture_decor","computers_accessories","housewares","watches_gifts","telephony","auto","garden_tools"),
+ #      col=c("red","blue","yellow","green","purple","black","magenta","green3","cyan","gray"),lty=3,lwd=15, cex=0.8)
+```
+
+
+
+
+
+
+
+

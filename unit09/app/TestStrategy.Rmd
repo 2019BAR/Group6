@@ -1,0 +1,159 @@
+---
+title: "相依變數的策略優化"
+output: 
+  flexdashboard::flex_dashboard:
+    theme: default
+    css: JH.css
+    social: menu
+    source_code: embed 
+    logo: nsysu48.png
+    favicon: nsysu48.png
+runtime: shiny
+---
+
+```{r}
+pacman::p_load(shinyWidgets, flexdashboard, pwr)
+```
+
+Input {.sidebar}
+-------------------------------------
+```{r}
+ 
+chooseSliderSkin("Nice")
+
+h6("報酬向量：")
+sliderInput("tp", "TP(K)",   0, 50,  20, 1)
+sliderInput("fn", "FN(K)", -50,  0, -30, 1)
+sliderInput("fp", "FP(K)", -50,  0, -55, 1)
+sliderInput("tn", "TN(K)",   0, 50,  20, 1)
+
+h6("(半)固定選項：")
+sliderInput("d",  "效果係數", 0.05, 0.25, 0.20, 0.01)
+sliderInput("mc", "抽樣成本", 5, 25, 20, 1)
+
+hr()
+
+```
+
+
+Column 1 {data-width="50%"}
+-------------------------------------
+### 指定效果量和顯著水準，找尋期望報酬最高的樣本大小和檢定力 {data-height=780}
+```{r}
+ut = function(n,d,a,c,pay) {
+  b = 1 - pwr.t.test(n=n, d=d, sig=a)$power
+  sum(0.5*c(1-b, b, a, 1-a) * pay) - n * c 
+  }
+
+renderPlot({
+  pv = c(input$tp, input$fn, input$fp, input$tn)
+  A = c(0.1,0.05,0.01,0.005); AS=as.character(A)
+  x = seq(input$X4[1],input$X4[2],length=100)
+  par(mar=c(4,4,2,1))
+  plot(1, 1, col='white', type='l', xlab='樣本大小',
+       ylab='$K', main="期望報酬", 
+       family="Microsoft JhengHei",
+       xlim=input$X4,ylim=input$Y4)
+  abline(v=seq(0,2000,100),
+         h=seq(input$Y4[1],input$Y4[2],1),
+         col='lightgray',lty=3)
+  for(i in 1:length(A)) {
+    y = sapply(x, ut, d=input$d, a=A[i], c=input$mc/1000, pay=pv)
+    nx = x[which.max(y)]
+    pwr = pwr.t.test(nx,input$d,A[i])$power
+    AS[i] = sprintf("%.3f (%.3f, %.f, %.3f)",A[i],pwr,nx,max(y))
+    lines(x, y, col=i, lwd=2)
+    points(nx, max(y),col=i,pch=19) }
+  legend("topright",AS,lty=1,col=1:length(A),lwd=2,
+         title="  Sig.level (Power,  N,  Ut.)")
+  })
+```
+
+### {data-height=220}
+```{r}
+inputPanel(
+  sliderInput("Y4", "Y軸", -8, 16, c(0, 7), 1),
+  sliderInput("X4", "X軸", 50, 1600, c(50,1000), 100)
+  )
+```
+
+Column 2 {data-width="50%"}
+-------------------------------------
+### 指定效果量，優化顯著水準、樣本大小和檢定力 {data-height=800}
+```{r}
+N= 50
+hm_col = colorRampPalette( c(
+  "black","darkblue", "blue", "green","orange", "red", "yellow"))(999)
+
+X = eventReactive(input$refresh, { 
+  pv = c(input$tp, input$fn, input$fp, input$tn)
+  d = input$d; mc = input$mc
+  a = seq(0.01,0.2,length=N)
+  p = seq(0.6,0.95,length=N)
+  x = z = matrix(NA, nrow=N, ncol=N) 
+  for(i in 1:N) for(j in 1:N) { 
+    z[i, j] = pwr.t.test(d=d, sig=a[i], power=p[j])$n
+    x[i, j] = sum(pv*c(p[j], 1-p[j], a[i], 1-a[i])/2) - 
+      (mc * z[i, j])/1000
+    }
+  list(a=a, p=p, x=x, z=z) 
+  }, ignoreNULL= FALSE)
+
+
+renderPlot({
+  a = X()$a; p = X()$p; x = X()$x; z = X()$z  
+  par(mar=c(4,4,2,1))
+  image(a, p, x,  col=hm_col, zlim=c(min(x), max(x)), 
+        xlab="顯著水準 (Sig. Level)", ylab="檢定力 (Test Power)", 
+        main="預期報酬 (K)",family="STHeitiTC-Light")
+  
+  w = which.max(x); i = w %% N; j = w %/% N
+  cx = (a[2] - a[1])/2; cy = (p[2] - p[1])/2 
+  if(i>0 & i<=N & j>0 & j<=N) {
+    points(a[i]+cx, p[j]+cy, pch='+')
+    text(a[i]+cx, p[j]+cy, round(x[i, j], 2), cex=0.8, pos=3)
+    }
+  
+  if("報酬" %in% input$contour) contour(
+    a, p, x, add=T, col='white', labcex=0.8, levels=seq(-10,10,0.5))
+
+  if("樣本" %in% input$contour) contour(
+    a, p, z, add=T, col='white', labcex=0.8, levels=seq(0,2000,100))
+  if("水準" %in% input$contour) abline(
+    v = c(0.005, 0.01, 0.05, 0.1), col='white')
+
+  }, 
+  outputArgs=list(hover = hoverOpts(id="plot_hover")) 
+  )
+```
+
+### {data-height=70}
+```{r}
+renderPrint( if( !is.null(input$plot_hover) ) {
+    a = input$plot_hover$x; p = input$plot_hover$y
+    pv = c(input$tp, input$fn, input$fp, input$tn)
+    d = input$d; mc = input$mc
+    n = pwr.t.test(d=d, sig=a, power=p)$n
+    px = sum(pv*c(p, 1-p, a, 1-a)/2) - mc*n/1000
+    s = sprintf("sig=%.2f, power=%.2f, eff=%.2f, n=%d, pay=%.2f",
+               a, p, d, ceiling(n), px)
+    print(s)
+})
+```
+
+### {data-height=130}
+```{r}
+inputPanel(
+    actionBttn(
+      "refresh", label="重新計算", style="simple", 
+      color="warning",icon = icon("concierge-bell") ),
+    awesomeCheckboxGroup(
+      inputId = "contour", label = "等高線", 
+      choices = c("報酬", "樣本", "水準"),
+      selected = "報酬", inline = T, status = "success") 
+    )
+
+```
+
+
+
