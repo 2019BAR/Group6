@@ -1,0 +1,199 @@
+---
+title: AS13A：類別模型、預測機率與商業決策 
+subtitle: 案例一：預防性醫療
+author: "第 6 組"
+date: "`r Sys.time()`"
+output: 
+  html_document:
+    highlight: pygments
+    theme: flatly
+    css: style.css
+---
+組員： `B035040052 林榮鏵` `B045020041諶彥汝` `B056090039 楊禾馨` `M064020056 閻俞蓉` `M064111003 洪筱涵` `M074111035 劉志峰`
+
+```{r results='hide', message=FALSE, warning=FALSE, echo=F}
+# Formating Codes.  Do not change the codes in this chunk !!
+rm(list=ls(all=T))
+knitr::opts_chunk$set(comment = NA)
+knitr::opts_knit$set(global.par = TRUE)
+par(cex=0.8)
+options(scipen=20, digits=5, width=80)
+if(!require(pacman)) install.packages("pacman")
+```
+<hr>
+
+```{r results='hide', message=FALSE, warning=FALSE}
+pacman::p_load(caTools, ggplot2, dplyr)
+```
+<br><hr>
+
+### 【A】整理資料、建立模型
+
++ 資料：糖尿病保戶醫療紀錄
+```{r}
+D = read.csv("data/quality.csv")  # Read in dataset
+summary(D)
+```
+
++ 基礎機率
+```{r}
+base = table(D$PoorCare) # the base probability
+base
+```
+
++ 分割資料 (分割向量)
+```{r}
+set.seed(88)
+split = sample.split(D$PoorCare, SplitRatio = 0.75)  # split vector
+table(split) %>% prop.table()
+```
+
++ 目標變數與分割向量的列聯表
+```{r}
+table(D$PoorCare, split) %>% prop.table(2)
+```
+
++ 使用分割向量分割資料
+```{r}
+TR = subset(D, split == TRUE)
+TS = subset(D, split == FALSE)
+```
+
++ 建立模型
+```{r}
+glm1 = glm(PoorCare ~ OfficeVisits + Narcotics, TR, family=binomial)
+summary(glm1)
+```
+<br><hr>
+
+
+### 【B】模型、係數與效果
+
+**模型：**
+
++ `Pr[y = 1] = 1/(1+exp(-f(x)))` 
+
++ $Logit = f(x) = b_0 + b_1 x_1 + b_2 x_2 \;\; (1)$
+
++ $Logit = f(x) = -2.6461 + 0.0821 \times OfficeVisits + 0.0763 \times Narcotics \;\; (2)$
+
+**係數：**
+
++ $Odd_0 = Exp(b_0 + b_1 x_1)\;\;(3)$
+
++ $Odd_1 = Exp[b_0 + b_1(x_1+1)] = Exp(b_0 + b_1 x_1 + b_1) = Exp(b_0 + b_1 x_1) \times Exp(b_1) \;\;(4)$
+
++ $Odd_1 = Odd_0 \times Exp(b_1) \:\:(5)$
+
++ $\frac{Odd_1}{Odd_0} =  Exp(b_1) \:\:(6)$
+
+<br>
+
+**機率和勝率之間的關係** 
+```{r} 
+pop = function(p, k) {o = p/(1-p);  o = k * o; o/(1+o)}
+p0 = seq(0.1, 0.9, 0.1); k = 2
+p1 = sapply(seq(0.1, 0.9, 0.1), pop, k)
+data.frame(k, p0, p1, difference=p1-p0, multiplier=p1/p0) %>% round(2) 
+```
+
+原來的機率是p，勝率增加k倍
+
+**變數的邊際效果** 
+```{r}
+df = data.frame(OfficeVisits = median(D$OfficeVisits), Narcotics=median(D$Narcotics))
+predict(glm1, df, type="response")
+```
+
+```{r}
+df = data.frame(OfficeVisits = median(D$OfficeVisits)+1, Narcotics=median(D$Narcotics))
+predict(glm1, df, type="response")
+```
+
+```{r}
+df = data.frame(OfficeVisits = median(D$OfficeVisits), Narcotics=median(D$Narcotics)+1)
+predict(glm1, df, type="response")
+```
+
+```{r}
+df = data.frame(OfficeVisits = median(D$OfficeVisits)+1, Narcotics=median(D$Narcotics)+1)
+predict(glm1, df, type="response")
+```
+
+<p class="wwl">
+<span style="font-size:24px">`r "\U1F4A1"` 學習重點：</span><br>
+&emsp; ■ 係數的指數就是勝率比；也就是說，$x_i$ 每增加一，勝率($Odd[y = 1]$)會變成原來的 $Exp(b_i)$ 倍<br>
+&emsp; ■ 各預測變數的(勝率)效果是相乘，而不是相加<br>
+&emsp; ■ 機率和勝率之間的關係並不是線性的：<br>
+&emsp; &emsp; ■ 邏輯式回歸裡面各預測變數的勝率效果是固定的<br>
+&emsp; &emsp; ■ 但是他們的機率效果並不是固定的<br>
+&emsp; &emsp; ■ 我們需先推算原先的機率，才能推算變數的機率效果<br><br>
+</p class="wwl"><br>
+
+
+```{r}
+quantile(D$OfficeVisits)
+```
+
+```{r}
+quantile(D$Narcotics)
+```
+<br>
+
+<p class="qiz">
+<span style="font-size:24px">`r "\U1F3AF"` 練習： </span><br>
+&emsp; ■ 當`OfficeVisits`和`Narcotic`分別等於他們的第一分位(`Q1`)時：<br>
+&emsp; &emsp; ■ `PoorCare = 1`的機率是？<font color=#5D8DE2>0.11192</font><br>
+&emsp; &emsp; ■ 兩個自變數的勝率效果分別是？<br>
+&emsp; &emsp;&emsp;&emsp;<font color=#5D8DE2>OfficeVisits：1.0856，Narcotics：1.0793</font><br>
+&emsp; &emsp; ■ 兩個自變數的機率效果分別是？<br>
+&emsp; &emsp;&emsp;&emsp;<font color=#5D8DE2>OfficeVisits：1.0753，Narcotics：1.0698</font><br>
+&emsp; ■ 當`OfficeVisits`和`Narcotic`分別等於他們的第三分位(`Q3`)時：<br>
+&emsp; &emsp; ■ `PoorCare = 1`的機率是？<font color=#5D8DE2>0.28947</font><br>
+&emsp; &emsp; ■ 兩個自變數的勝率效果分別是？<br>
+&emsp; &emsp;&emsp;&emsp;<font color=#5D8DE2>OfficeVisits：1.0856，Narcotics：1.0793</font><br>
+&emsp; &emsp; ■ 兩個自變數的機率效果分別是？<br>
+&emsp; &emsp;&emsp;&emsp;<font color=#5D8DE2>OfficeVisits：1.0593，Narcotics：1.0551</font><br>
+&emsp; ■ 比較以上兩個題目的答案，我們可以觀察到什麼？<br>
+&emsp; &emsp;&emsp;&emsp;<font color=#5D8DE2>機率效果會變，而勝率效果是跟模型係數所以不會變。</font><br><br>
+</p class="qiz"><br>
+
+**Code**
+```{r}
+df = data.frame(OfficeVisits = quantile(D$OfficeVisits,0.75), Narcotics=quantile(D$Narcotics,0.75))
+predict(glm1, df, type="response") #25%:0.28947
+#勝率效果
+exp(0.0821)#OfficeVisits勝率效果
+exp(0.0763)#Narcotics勝率效果
+#機率效果
+df = data.frame(OfficeVisits = quantile(D$OfficeVisits,0.75)+1, Narcotics=quantile(D$Narcotics,0.75))
+predict(glm1, df, type="response") #75%:0.30665
+df = data.frame(OfficeVisits = quantile(D$OfficeVisits,0.75), Narcotics=quantile(D$Narcotics,0.75)+1)
+predict(glm1, df, type="response") #75%:0.30541
+0.30665/0.11192 #OfficeVisits機率效果
+0.11973/0.11192 #Narcotics機率效果
+```
+
+```{r}
+df = data.frame(OfficeVisits = quantile(D$OfficeVisits,0.25), Narcotics=quantile(D$Narcotics,0.25))
+predict(glm1, df, type="response") #25%:0.11192
+#勝率效果
+exp(0.0821)#OfficeVisits勝率效果
+exp(0.0763)#Narcotics勝率效果
+#機率效果
+df = data.frame(OfficeVisits = quantile(D$OfficeVisits,0.25)+1, Narcotics=quantile(D$Narcotics,0.25))
+predict(glm1, df, type="response") #25%:0.12035
+df = data.frame(OfficeVisits = quantile(D$OfficeVisits,0.25), Narcotics=quantile(D$Narcotics,0.25)+1)
+predict(glm1, df, type="response") #25%:0.11973
+0.30665/0.28947 #OfficeVisits機率效果
+0.30541/0.28947 #Narcotics機率效果
+```
+
+
+
+
+
+<br><hr><br><br><br>
+
+
+
