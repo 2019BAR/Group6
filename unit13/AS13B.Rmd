@@ -1,0 +1,195 @@
+---
+title: AS13B：類別模型、預測機率與商業決策 
+subtitle: 模型的準確性
+author: "第 6 組"
+date: "`r Sys.time()`"
+output: 
+  html_document:
+    highlight: pygments
+    theme: flatly
+    css: style.css
+---
+組員： `B035040052 林榮鏵` `B045020041諶彥汝` `B056090039 楊禾馨` `M064020056 閻俞蓉` `M064111003 洪筱涵` `M074111035 劉志峰`
+
+```{r results='hide', message=FALSE, warning=FALSE, echo=F}
+# Formating Codes.  Do not change the codes in this chunk !!
+rm(list=ls(all=T))
+knitr::opts_chunk$set(comment = NA)
+knitr::opts_knit$set(global.par = TRUE)
+par(cex=0.8)
+options(scipen=20, digits=5, width=80)
+if(!require(pacman)) install.packages("pacman")
+```
+<hr>
+
+```{r results='hide', message=FALSE, warning=FALSE}
+pacman::p_load(caTools, ggplot2, dplyr)
+D = read.csv("data/quality.csv")  # Read in dataset
+set.seed(88)
+split = sample.split(D$PoorCare, SplitRatio = 0.75)  # split vector
+TR = subset(D, split == TRUE)
+TS = subset(D, split == FALSE)
+glm1 = glm(PoorCare ~ OfficeVisits + Narcotics, TR, family=binomial)
+summary(glm1)
+```
+<br><hr>
+
+
+### 【A】傳統準確性指標
+
+![Fig 13.1 - 混淆矩陣與模型準確性指標](Fig13.1.JPG)
+
+<br>
+
+##### Training Data
+
+**預測機率 Predicted Probability (Training)**
+```{r fig.height=3.2, fig.width=6.4}
+par(cex=0.8)
+pred = predict(glm1, type="response")
+hist(pred)
+abline(v=0.5, col='red')
+```
+
+**混淆矩陣 Confusion Matrix (Training)**
+```{r}
+cmx = table(Acture=TR$PoorCare, Predict=pred > 0.5)
+cmx
+```
+
+**模型準確性指標 Accuracy Matrices (Training)**
+```{r}
+A2x2 = function(x, k=3) c(
+  accuracy = sum(diag(x))/sum(x),
+  sensitivity = as.numeric(x[2,2]/rowSums(x)[2]),
+  specificity = as.numeric(x[1,1]/rowSums(x)[1])
+  ) %>% round(k)
+A2x2(cmx)
+```
+<br>
+
+##### Testing Data
+
+**預測機率 Predicted Probability (Testing)**
+```{r fig.height=3.2, fig.width=6.4}
+par(cex=0.8)
+pred2 = predict(glm1, newdata=TS, type="response")
+hist(pred2, 10)
+abline(v=0.5, col='red')
+```
+
+**混淆矩陣 Confusion Matrix (Testing)**
+```{r}
+cmx2 = table(Acture=TS$PoorCare, Predict=pred2 > 0.5)
+cmx2
+```
+
+**模型準確性指標 Accuracy Matrices (Testing)**
+```{r}
+sapply(list(Train=cmx, Test=cmx2), A2x2)
+```
+<br><br><hr>
+
+### 【B】預測機率分佈、臨界機率、混淆矩陣
+
+![Fig 13.2 - 預測機率分佈、臨界機率、混淆矩陣](Fig13.2.JPG)
+
+<br>
+
+**預測機率分佈 (DPP) - Distribution of Predicted Probability (Training)**
+```{r fig.height=3.2, fig.width=7}
+data.frame(y=factor(TR$PoorCare), pred=pred) %>% 
+  ggplot(aes(x=pred, fill=y)) + 
+  geom_histogram(bins=20, col='white', position="stack", alpha=0.5) +
+  ggtitle("Distribution of Predicted Probability (DPP)") +
+  xlab("predicted probability")
+```
+<br><br><br><hr>
+
+### 【C】作業曲線(ROC)與辨識率(AUC)
+
+**ROC - Receiver Operation Curve**
+```{r fig.height=4, fig.width=7.2}
+par(mfrow=c(1,2), cex=0.8)
+trAUC = colAUC(pred, y=TR$PoorCare, plotROC=T)
+tsAUC = colAUC(pred2, y=TS$PoorCare, plotROC=T)
+```
+
+**AUC - Area Under Curve**
+```{r}
+c(trAUC, tsAUC)
+```
+<br><hr>
+
+<p class="qiz">
+<span style="font-size:24px">`r "\U1F3AF"` 練習： </span><br>
+使用`TR$MemberID`以外的所有欄位，建立一個邏輯式回歸模型來預測`PoorCare`，並：<br>
+&emsp; 【A】 分別畫出`Training`和`Testing`的`DPP`<br>
+</p class="qiz">
+```{r}
+glm_total = glm(PoorCare ~ . - MemberID, TR, family=binomial)
+summary(glm_total)
+
+#Predicted Probability (Training)
+pred_tr = predict(glm_total, newdata=TR, type="response")
+#Predicted Probability (Testing)
+pred_ts = predict(glm_total, newdata=TS, type="response")
+```
+
+```{r}
+par(mfrow=c(1,2), cex=0.8)
+#DPP (Training)
+data.frame(y=factor(TR$PoorCare), pred=pred_tr) %>% 
+  ggplot(aes(x=pred, fill=y)) + 
+  geom_histogram(bins=20, col='white', position="stack", alpha=0.5) +
+  ggtitle("Distribution of Predicted Probability (DPP) - Training") +
+  xlab("predicted probability")
+#DPP (Testing)
+data.frame(y=factor(TS$PoorCare), pred=pred_ts) %>% 
+  ggplot(aes(x=pred, fill=y)) + 
+  geom_histogram(bins=20, col='white', position="stack", alpha=0.5) +
+  ggtitle("Distribution of Predicted Probability (DPP) - Test") +
+  xlab("predicted probability")
+```
+
+<p class="qiz">
+&emsp; 【B】 分別畫出`Training`和`Testing`的`ROC`<br>
+</p class="qiz">
+```{r}
+par(mfrow=c(1,2), cex=0.8)
+trAUC = colAUC(pred_tr, y=TR$PoorCare, plotROC=T)
+tsAUC = colAUC(pred_ts, y=TS$PoorCare, plotROC=T)
+```
+
+<p class="qiz">
+&emsp; 【C】 分別算出`Training`和`Testing`的`ACC`、`SENS`和`SPEC`<br>
+</p class="qiz">
+```{r}
+cmx_tr = table(Acture=TR$PoorCare, Predict=pred_tr > 0.5)
+cmx_ts = table(Acture=TS$PoorCare, Predict=pred_ts > 0.5)
+sapply(list(Train=cmx_tr, Test=cmx_ts), A2x2)
+```
+
+<p class="qiz">
+&emsp; 【D】 分別算出`Training`和`Testing`的`AUC`<br>
+</p class="qiz">
+```{r}
+c(trAUC, tsAUC)
+```
+
+<p class="qiz">
+&emsp; 【E】 跟用兩個預測變數的模型相比，這一個模型有比較準嗎？<br>
+&emsp; &emsp;&emsp;&emsp;<font color=#5D8DE2>用全部變數的模型比較準</font><br>
+&emsp; 【F】 為什麼它比較準(或比較不準)呢？<br>
+&emsp; &emsp;&emsp;&emsp;<font color=#5D8DE2>全部的變數都有考慮進去</font><br><br>
+</p class="qiz">
+
+
+<br><hr><br><br><br>
+
+
+
+
+
+
+
