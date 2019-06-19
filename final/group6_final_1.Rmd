@@ -1,0 +1,154 @@
+---
+title: "Ta Feng Grocery"
+author: "Group6"
+date: "`r Sys.time()`"
+output: html_document
+---
+組員： `B035040052 林榮鏵` `B045020041諶彥汝` `B056090039 楊禾馨` `M064020056 閻俞蓉` `M064111003 洪筱涵` `M074111035 劉志峰`
+<hr>
+
+#### Loading & Preparing Data
+```{r echo=T, message=F, cache=F, warning=F}
+pacman::p_load(dplyr,ggplot2,caTools,data.table,stringr)
+load("../final/data/tf2.rdata")
+```
+
+##### Spliting for Classification 
+```{r}
+TR = subset(A, spl) # 20008
+TS = subset(A, !spl)# 8576
+```
+<br><hr>
+
+#### Classification Model
+```{r}
+glm1 = glm(buy ~ ., TR[,c(2:9, 11)], family=binomial()) 
+summary(glm1)
+pred =  predict(glm1, TS, type="response")
+cm = table(actual = TS$buy, predict = pred > 0.5); cm
+acc.ts = cm %>% {sum(diag(.))/sum(.)}; acc.ts          # 0.69998
+colAUC(pred, TS$buy)                                   # 0.7556
+```
+<br><hr>
+
+#### Regression Model
+```{r}
+A2 = subset(A, A$buy) %>% mutate_at(c("m","rev","amount"), log10)
+TR2 = subset(A2, spl2) #9269
+TS2 = subset(A2, !spl2)#3973
+```
+
+```{r}
+lm1 = lm(amount ~ ., TR2[,c(2:6,8:10)])
+summary(lm1)
+```
+
+```{r}
+r2.tr = summary(lm1)$r.sq
+SST = sum((TS2$amount - mean(TR2$amount))^ 2)
+SSE = sum((predict(lm1, TS2) -  TS2$amount)^2)
+r2.ts = 1 - (SSE/SST)
+c(r2.tr, r2.ts) #0.2909908 0.2575966
+```
+<br><hr>
+
+#### Prediction
+Aggregate data 2000-12-01 ~ 2001~02-28. 
+```{r}
+load("../final/data/tf0.rdata")
+d0 = max(X0$date) + 1
+B = X0 %>% 
+  filter(date >= as.Date("2000-12-01")) %>% 
+  mutate(days = as.integer(difftime(d0, date, units="days"))) %>% 
+  group_by(cust) %>% summarise(
+    r = min(days),      # recency
+    s = max(days),      # seniority
+    f = n(),            # frquency
+    m = mean(total),    # monetary
+    rev = sum(total),   # total revenue contribution
+    raw = sum(gross),   # total gross profit contribution
+    age = age[1],       # age group
+    area = area[1],     # area code
+  ) %>% data.frame      # 28531
+```
+
+In `B`, there is a record for each customer. `B$Buy` is the probability of buying in March.
+```{r}
+B$Buy = predict(glm1, B, type="response")
+```
+
+<span style="font-size:24px">`r "\U1F4A1"`：</span>
+預測購買金額時要記得做指數、對數轉換！
+
+```{r}
+B2 = B %>% mutate_at(c("m","rev"), log10)
+B$Rev = 10^predict(lm1, B2)
+```
+
+```{r fig.height=2.4, fig.width=7.2}
+par(mfrow=c(1,2), cex=0.8)
+hist(B$Buy)
+hist(log(B$Rev,10))
+```
+
+
+####Cluster group vs buy
+```{r}
+#write.csv(G,file="../final/G.csv")
+tf=fread("~/2019RPB/final/ta_feng_all_months_merged.csv")%>% 
+  setNames(c("date","cust","age","area","subclass","prod","qty","cost","price"))
+tf$date = as.Date(tf$date, format = "%m/%d/%Y")#改成date函數
+G = tf %>% 
+  mutate(days = as.integer(as.Date("2001-03-01") - date)) %>% 
+  group_by(cust) %>% summarise(
+    recent = min(days),     # 最近購買距今天數 
+                            # 選days裡面最小的
+    freq = n(),             # 購買次數
+    money = mean(price),    # 平均購買金額
+    senior = max(days),     # 第一次購買距今天數
+                            # 選"天數"裡面最大的
+    since = min(date)       # 第一次購買日期#看它的"日期""
+  ) %>% data.frame
+
+#顧客分群
+set.seed(6)
+G$grp = kmeans(scale(G[,2:4]),10)$cluster
+table(G$grp)#族群大小
+group_by(G, grp) %>% summarise(
+  recent=mean(recent), 
+  freq=mean(freq), 
+  money=mean(money), 
+  size=n() ) %>% 
+  mutate( revenue = size*money/1000 )  %>% 
+  filter(size > 1) %>% 
+  ggplot(aes(x=freq, y=money)) +
+  geom_point(aes(size=revenue, col=recent),alpha=0.5) +
+  scale_size(range=c(4,30)) +
+  scale_color_gradient(low="green",high="red") +
+  scale_x_log10() + scale_y_log10(limits=c(30,40000)) + 
+  geom_text(aes(label = size ),size=3) +
+  theme_bw() + guides(size=F) +
+  labs(title="Customer Segements",
+       subtitle="(bubble_size:revenue_contribution; text:group_size)",
+       color="Recency") +
+  xlab("Frequency (log)") + ylab("Average Transaction Amount (log)")
+```
+
+####groups (3,4,6) 的回購率
+```{r}
+G$cust=str_pad(G$cust,8,"left",'0')#前面補0到八位
+group=merge(G,B,by="cust")
+grp3<-subset(group, grp==3) #72
+mean(grp3$Buy) #33.5%
+mean(grp3$Rev) #1272.795元
+grp4<-subset(group, grp==4) #9394
+mean(grp4$Buy) #43%
+mean(grp4$Rev) #716.3349元
+grp6<-subset(group, grp==6) #2968
+mean(grp6$Buy) #72%
+mean(grp6$Rev) #1481.14元
+```
+
+<br><br><hr><br><br>
+
+

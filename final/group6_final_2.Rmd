@@ -1,0 +1,214 @@
+---
+title: "Ta Feng Grocery"
+author: "Group6"
+date: "`r Sys.time()`"
+output: html_document
+---
+組員： B035040052 林榮鏵 B045020041諶彥汝 B056090039 楊禾馨 M064020056 閻俞蓉 M064111003 洪筱涵 M074111035 劉志峰
+<hr>
+
+
+```{r}
+packages = c(
+  "data.table","dplyr","ggplot2","googleVis","devtools","magrittr","caTools","ROCR","caTools","d3heatmap","readr","manipulate","latex2exp")
+existing = as.character(installed.packages()[,1])
+for(pkg in packages[!(packages %in% existing)]) install.packages(pkg)
+
+if(!is.element("chorddiag", existing))
+  devtools::install_github("mattflor/chorddiag")
+```
+
+```{r}
+library(data.table)
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(caTools)
+library(ROCR)
+library(googleVis)
+library(chorddiag)
+library(d3heatmap)
+library(manipulate)
+library(latex2exp)
+```
+
+```{r}
+tf = read_csv("data/ta_feng.csv")%>%setNames(c("date","cust","age","area","cat","prod","qty","cost","price"))
+# Read in dataset"fread"也可以
+summary(tf)
+```
+```{r}
+tf$date=as.Date(tf$date,format="%m/%d/%Y")
+tf$age[is.na(tf$age)] = "na"
+tf$age = factor(tf$age, levels=c(
+  "<25","25-29","30-34","35-39","40-44","45-49","50-54","55-59","60-64",">65","na"), labels=c(
+  "a20","a25","a30","a35","a40","a45","a50","a55","a60","a65","na"
+  )) %>% as.character
+tf$area = paste0("z",tf$area)
+feb01=as.Date("2001-02-01")
+train=subset(tf,date<feb01)
+test=subset(tf,date>feb01)
+```
+
+```{r}
+Z = tf %>% 
+  mutate(days = as.integer(as.Date("2001-03-01") - date)) %>% #距離今天的時間
+  group_by(cust) %>% summarise(
+    recent = min(days),     # 最近購買距今天數 
+                            # 選days裡面最小的
+    freq = n(),             # 購買次數
+    money = mean(price),   # 平均購買金額
+    senior = max(days),     # 第一次購買距今天數
+                            # 選"天數"裡面最大的
+    since = min(date)       # 第一次購買日期#看它的"日期""
+  ) %>% data.frame
+```
+```{r}
+set.seed(6)
+Z$grp = kmeans(scale(Z[,2:4]),10)$cluster
+table(Z$grp)
+```
+```{r}
+#顧客群組屬性
+group_by(Z,grp) %>% summarise(
+  recent=mean(recent), 
+  freq=mean(freq), 
+  money=mean(money), 
+  size=n() ) %>% 
+  mutate( revenue = size*money/1000 )  %>% 
+  filter(size > 1) %>% 
+  ggplot(aes(x=freq, y=money)) +
+  geom_point(aes(size=revenue, col=recent),alpha=0.5) +
+  scale_size(range=c(4,30)) +
+  scale_color_gradient(low="green",high="red") +
+  scale_x_log10() + scale_y_log10(limits=c(30,40000)) + 
+  geom_text(aes(label = size ),size=3) +
+  theme_bw() + guides(size=F) +
+  labs(title="Customer Segements",
+       subtitle="(bubble_size:revenue_contribution; text:group_size)",
+       color="Recency") +
+  xlab("Frequency (log)") + ylab("Average Transaction Amount (log)")
+```
+```{r}
+#合併資料
+tfZ=merge(tf, Z, by="cust")
+```
+
+```{r}
+#資料摘要
+summary(tfZ)
+```
+
+```{r}
+#篩選指定族群（群組3，4，6）
+grp3=filter(tfZ,grp=="3")
+grp4=filter(tfZ,grp=="4")
+grp6=filter(tfZ,grp=="6")
+```
+```{r}
+#Grp3 各地區與各年齡層
+table(grp3$age,grp3$area)%>%
+ as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('DarkGreen','Orange','Red')))
+```
+
+```{r}
+#Grp3 各地區與來店頻率
+table(grp3$freq,grp3$area)%>%
+{./rowSums(.)}%>% 
+as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('White','DarkBlue','Black')))
+```
+```{r}
+#Grp3 各年齡層來店的頻率次數
+table(grp3$age,grp3$freq)%>%
+as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('DarkGreen','Orange','Red')))
+```
+```{r}
+#Grp3 “各年齡層”與日期的關係
+table(format(grp3$date,"%u"),format(grp3$age)) %>%
+  as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('DarkGreen','Orange','Red')))
+```
+```{r}
+#Grp3 各年齡層與“商品數量”的關係
+table(grp3$qty,grp3$age)%>%
+{./rowSums(.)}%>% 
+as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('White','DarkBlue','Black')))
+```
+```{r}
+#Grp4 各地區與各年齡層
+table(grp4$age,grp4$area)%>%
+ as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('DarkGreen','Orange','Red')))
+```
+
+```{r}
+#Grp4 各地區與來店頻率
+table(grp4$freq,grp4$area)%>%
+{./rowSums(.)}%>% 
+as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('White','DarkBlue','Black')))
+```
+
+```{r}
+#Grp4 各年齡層來店的頻率次數
+table(grp4$age,grp4$freq)%>%
+as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('DarkGreen','Orange','Red')))
+```
+
+```{r}
+#Grp4 “各年齡層”與日期的關係
+table(format(grp4$date,"%u"),format(grp4$age)) %>%
+  as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('DarkGreen','Orange','Red')))
+```
+
+```{r}
+#Grp4 各年齡層與“商品數量”的關係
+table(grp4$qty,grp4$age)%>%
+{./rowSums(.)}%>% 
+as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('White','DarkBlue','Black')))
+```
+
+```{r}
+#Grp6 各地區與各年齡層
+table(grp6$age,grp6$area)%>%
+ as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('DarkGreen','Orange','Red')))
+```
+
+```{r}
+#Grp6 各地區與來店頻率
+table(grp6$freq,grp6$area)%>%
+{./rowSums(.)}%>% 
+as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('White','DarkBlue','Black')))
+```
+
+```{r}
+#Grp6 各年齡層來店的頻率次數
+table(grp6$age,grp6$freq)%>%
+as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('DarkGreen','Orange','Red')))
+```
+
+```{r}
+#Grp6 “各年齡層”與日期的關係
+table(format(grp6$date,"%u"),format(grp6$age)) %>%
+  as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('DarkGreen','Orange','Red')))
+```
+
+```{r}
+#Grp6 各年齡層與“商品數量”的關係
+table(grp6$qty,grp6$age)%>%
+{./rowSums(.)}%>% 
+as.data.frame.matrix %>% 
+  d3heatmap(F,F,col=colorRamp(c('White','DarkBlue','Black')))
+```
+
